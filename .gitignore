@@ -1,4 +1,5 @@
 .vscode/
+.meowconfig/
 build/
 output/
 out/
