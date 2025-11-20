@@ -151,6 +151,7 @@ MeowVM::MeowVM(const std::string& entry_point_directory, const std::string& entr
     op_dispatcher_ = std::make_unique<OperatorDispatcher>(heap_.get());
 
     printl("MeowVM initialized successfully!");
+    std::cout << "[log] Detected size of value is: " << std::to_string(sizeof(value_t)) << "\n";
 }
 
 MeowVM::~MeowVM() noexcept {
