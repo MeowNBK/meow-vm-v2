@@ -1,10 +1,7 @@
 /**
  * @file array.h
  * @author LazyPaws
- * @brief Core definition of Array in TrangMeo
- * @copyright Copyright (c) 2025 LazyPaws
- * @license All rights reserved. Unauthorized copying of this file, in any form
- * or medium, is strictly prohibited
+ * @brief Core definition of Array in TrangMeo (C++23 Refactored)
  */
 
 #pragma once
@@ -42,101 +39,74 @@ public:
     using reverse_iterator = container_t::reverse_iterator;
     using const_reverse_iterator = container_t::const_reverse_iterator;
 
-    // --- Element access ---
+    // --- Element access (C++23 Deducing this) ---
 
     /// @brief Unchecked element access. For performance-critical code
-    [[nodiscard]] inline meow::return_t get(size_t index) const noexcept {
-        return elements_[index];
+    template <typename Self>
+    [[nodiscard]] inline decltype(auto) get(this Self&& self, size_t index) noexcept {
+        return std::forward<Self>(self).elements_[index]; 
     }
-    /// @brief Unchecked element modification. For performance-critical code
+
+    /// @brief Checked element access. Throws if index is OOB
+    template <typename Self>
+    [[nodiscard]] inline decltype(auto) at(this Self&& self, size_t index) {
+        return std::forward<Self>(self).elements_.at(index);
+    }
+
+    // Gộp cả const và non-const operator[]
+    template <typename Self>
+    inline decltype(auto) operator[](this Self&& self, size_t index) noexcept {
+        return std::forward<Self>(self).elements_[index];
+    }
+
+    // Gộp front/back
+    template <typename Self>
+    [[nodiscard]] inline decltype(auto) front(this Self&& self) noexcept {
+        return std::forward<Self>(self).elements_.front();
+    }
+
+    template <typename Self>
+    [[nodiscard]] inline decltype(auto) back(this Self&& self) noexcept {
+        return std::forward<Self>(self).elements_.back();
+    }
+
+    // --- Unchecked modification (Explicitly non-const only) ---
     template <typename T>
     inline void set(size_t index, T&& value) noexcept {
         elements_[index] = std::forward<T>(value);
     }
-    /// @brief Checked element access. Throws if index is OOB
-    [[nodiscard]] inline meow::return_t at(size_t index) const {
-        return elements_.at(index);
-    }
-    inline meow::return_t operator[](size_t index) const noexcept {
-        return elements_[index];
-    }
-    inline meow::mutable_t operator[](size_t index) noexcept {
-        return elements_[index];
-    }
-    [[nodiscard]] inline meow::return_t front() const noexcept {
-        return elements_.front();
-    }
-    [[nodiscard]] inline meow::mutable_t front() noexcept {
-        return elements_.front();
-    }
-    [[nodiscard]] inline meow::return_t back() const noexcept {
-        return elements_.back();
-    }
-    [[nodiscard]] inline meow::mutable_t back() noexcept {
-        return elements_.back();
-    }
 
     // --- Capacity ---
-    [[nodiscard]] inline size_t size() const noexcept {
-        return elements_.size();
-    }
-    [[nodiscard]] inline bool empty() const noexcept {
-        return elements_.empty();
-    }
-    [[nodiscard]] inline size_t capacity() const noexcept {
-        return elements_.capacity();
-    }
+    [[nodiscard]] inline size_t size() const noexcept { return elements_.size(); }
+    [[nodiscard]] inline bool empty() const noexcept { return elements_.empty(); }
+    [[nodiscard]] inline size_t capacity() const noexcept { return elements_.capacity(); }
 
     // --- Modifiers ---
     template <typename T>
-    inline void push(T&& value) {
-        elements_.emplace_back(std::forward<T>(value));
-    }
-    inline void pop() noexcept {
-        elements_.pop_back();
-    }
+    inline void push(T&& value) { elements_.emplace_back(std::forward<T>(value)); }
+    inline void pop() noexcept { elements_.pop_back(); }
+    
     template <typename... Args>
-    inline void emplace(Args&&... args) {
-        elements_.emplace_back(std::forward<Args>(args)...);
-    }
-    inline void resize(size_t size) {
-        elements_.resize(size);
-    }
-    inline void reserve(size_t capacity) {
-        elements_.reserve(capacity);
-    }
-    inline void shrink() {
-        elements_.shrink_to_fit();
-    }
-    inline void clear() {
-        elements_.clear();
-    }
+    inline void emplace(Args&&... args) { elements_.emplace_back(std::forward<Args>(args)...); }
+    
+    inline void resize(size_t size) { elements_.resize(size); }
+    inline void reserve(size_t capacity) { elements_.reserve(capacity); }
+    inline void shrink() { elements_.shrink_to_fit(); }
+    inline void clear() { elements_.clear(); }
 
-    // --- Iterators ---
-    inline iterator begin() noexcept {
-        return elements_.begin();
-    }
-    inline iterator end() noexcept {
-        return elements_.end();
-    }
-    inline const_iterator begin() const noexcept {
-        return elements_.begin();
-    }
-    inline const_iterator end() const noexcept {
-        return elements_.end();
-    }
-    inline reverse_iterator rbegin() noexcept {
-        return elements_.rbegin();
-    }
-    inline reverse_iterator rend() noexcept {
-        return elements_.rend();
-    }
-    inline const_reverse_iterator rbegin() const noexcept {
-        return elements_.rbegin();
-    }
-    inline const_reverse_iterator rend() const noexcept {
-        return elements_.rend();
-    }
+    // --- Iterators (C++23 Deducing this) ---
+    
+    template <typename Self>
+    inline auto begin(this Self&& self) noexcept { return std::forward<Self>(self).elements_.begin(); }
+    
+    template <typename Self>
+    inline auto end(this Self&& self) noexcept { return std::forward<Self>(self).elements_.end(); }
+
+    template <typename Self>
+    inline auto rbegin(this Self&& self) noexcept { return std::forward<Self>(self).elements_.rbegin(); }
+
+    template <typename Self>
+    inline auto rend(this Self&& self) noexcept { return std::forward<Self>(self).elements_.rend(); }
 
     void trace(visitor_t& visitor) const noexcept override;
 };

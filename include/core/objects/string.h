@@ -1,10 +1,7 @@
 /**
  * @file string.h
  * @author LazyPaws
- * @brief Core definition of String in TrangMeo
- * @copyright Copyright (c) 2025 LazyPaws
- * @license All rights reserved. Unauthorized copying of this file, in any form
- * or medium, is strictly prohibited
+ * @brief Core definition of String in TrangMeo (C++23 Refactored)
  */
 
 #pragma once
@@ -36,6 +33,7 @@ public:
     inline ObjString operator+(const ObjString& other) const noexcept {
         return ObjString(data_ + other.data_);
     }
+    // (Giữ nguyên operator!...)
     inline ObjString operator!() const noexcept {
         std::string temp(data_.size(), '\0');
         for (size_t i = 0; i < data_.size(); ++i) {
@@ -47,44 +45,44 @@ public:
     // --- Iterator types ---
     using const_iterator = storage_t::const_iterator;
     using const_reverse_iterator = storage_t::const_reverse_iterator;
+    // Thêm iterator non-const nếu muốn sửa nội dung (dù string thường immutable)
+    using iterator = storage_t::iterator; 
 
-    // --- Character access ---
+    // --- Character access (C++23) ---
+    // template <typename Self>
+    // [[nodiscard]] inline decltype(auto) get(this Self&& self, size_t index) noexcept {
+    //     return std::forward<Self>(self).data_[index];
+    // }
 
-    /// @brief Unchecked character access. For performance-critical code
     [[nodiscard]] inline char get(size_t index) const noexcept {
         return data_[index];
     }
-    /// @brief Checked character access. Throws if index is OOB
-    [[nodiscard]] inline char at(size_t index) const {
-        return data_.at(index);
+    
+    template <typename Self>
+    [[nodiscard]] inline decltype(auto) at(this Self&& self, size_t index) {
+        return std::forward<Self>(self).data_.at(index);
     }
 
     // --- String access ---
-    [[nodiscard]] inline const char* c_str() const noexcept {
-        return data_.c_str();
-    }
+    [[nodiscard]] inline const char* c_str() const noexcept { return data_.c_str(); }
 
     // --- Capacity ---
-    [[nodiscard]] inline size_t size() const noexcept {
-        return data_.size();
-    }
-    [[nodiscard]] inline bool empty() const noexcept {
-        return data_.empty();
-    }
+    [[nodiscard]] inline size_t size() const noexcept { return data_.size(); }
+    [[nodiscard]] inline bool empty() const noexcept { return data_.empty(); }
 
-    // --- Iterators ---
-    inline const_iterator begin() const noexcept {
-        return data_.begin();
-    }
-    inline const_iterator end() const noexcept {
-        return data_.end();
-    }
-    inline const_reverse_iterator rbegin() const noexcept {
-        return data_.rbegin();
-    }
-    inline const_reverse_iterator rend() const noexcept {
-        return data_.rend();
-    }
+    // --- Iterators (C++23 Deducing this) ---
+    
+    template <typename Self>
+    inline auto begin(this Self&& self) noexcept { return std::forward<Self>(self).data_.begin(); }
+    
+    template <typename Self>
+    inline auto end(this Self&& self) noexcept { return std::forward<Self>(self).data_.end(); }
+    
+    template <typename Self>
+    inline auto rbegin(this Self&& self) noexcept { return std::forward<Self>(self).data_.rbegin(); }
+    
+    template <typename Self>
+    inline auto rend(this Self&& self) noexcept { return std::forward<Self>(self).data_.rend(); }
 
     inline void trace(visitor_t&) const noexcept override {}
 };
