@@ -6,9 +6,9 @@
 #include "core/value.h"
 #include "core/meow_object.h"
 
-namespace meow::memory { class MemoryManager; }
+namespace meow::inline memory { class MemoryManager; }
 
-namespace meow::runtime {
+namespace meow::inline runtime {
 
 constexpr size_t NUM_VALUE_TYPES = static_cast<size_t>(core::ValueType::TotalValueTypes);
 constexpr size_t NUM_OPCODES = static_cast<size_t>(core::OpCode::TOTAL_OPCODES);
@@ -46,7 +46,7 @@ public:
         return unary_dispatch_table_[+op_code][+right_type];
     }
 private:
-    memory::MemoryManager* heap_;
+    [[maybe_unused]] memory::MemoryManager* heap_;
     binary_function_t binary_dispatch_table_[NUM_OPCODES][NUM_VALUE_TYPES][NUM_VALUE_TYPES];
     unary_function_t unary_dispatch_table_[NUM_OPCODES][NUM_VALUE_TYPES];
 };

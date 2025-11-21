@@ -6,7 +6,7 @@
 #include "core/meow_object.h"
 #include "core/object_traits.h"
 
-namespace meow::core {
+namespace meow::inline core {
 
 using base_t = meow::variant<null_t, bool_t, int_t, float_t, object_t>;
 

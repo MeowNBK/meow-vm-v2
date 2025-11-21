@@ -1,10 +1,8 @@
 #pragma once
 
-namespace meow::memory {
-struct GCVisitor;
-}
+namespace meow::inline memory { struct GCVisitor; }
 
-namespace meow::core {
+namespace meow::inline core {
 
 enum class ObjectType : uint8_t {
     ARRAY = 5,

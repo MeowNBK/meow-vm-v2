@@ -5,7 +5,7 @@
 #include "core/type.h"
 #include "memory/garbage_collector.h"
 
-namespace meow::memory {
+namespace meow::inline memory {
 class MemoryManager {
 public:
     explicit MemoryManager(std::unique_ptr<meow::memory::GarbageCollector> gc) noexcept;

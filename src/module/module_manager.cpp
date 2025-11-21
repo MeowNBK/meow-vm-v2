@@ -8,7 +8,7 @@
 #include "module/module_utils.h"
 #include "vm/meow_engine.h"
 #include "module/loader/binary_loader.h"
-namespace meow::module {
+namespace meow::inline module {
 
 using namespace meow::core;
 using namespace meow::loader;

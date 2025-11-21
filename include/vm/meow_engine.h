@@ -1,6 +1,6 @@
 #pragma once
 
-namespace meow::vm {
+namespace meow::inline vm {
 class MeowEngine {
    public:
 };

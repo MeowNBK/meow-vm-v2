@@ -3,7 +3,7 @@
 #include "common/pch.h"  // includes all needed
 #include "loader/tokens.h"
 
-namespace meow::loader {
+namespace meow::inline loader {
 
 class Lexer {
    public:

@@ -16,7 +16,7 @@
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::core::objects {
+namespace meow::inline core::inline objects {
 class ObjHashTable : public meow::core::ObjBase<ObjectType::HASH_TABLE> {
    private:
     using key_t = meow::core::string_t;

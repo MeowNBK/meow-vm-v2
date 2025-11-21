@@ -17,7 +17,7 @@
 #include "memory/gc_visitor.h"
 #include "runtime/chunk.h"
 
-namespace meow::core::objects {
+namespace meow::inline core::inline objects {
 struct UpvalueDesc {
     bool is_local_;
     size_t index_;

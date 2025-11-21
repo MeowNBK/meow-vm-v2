@@ -6,7 +6,7 @@
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::runtime {
+namespace meow::inline runtime {
 struct CallFrame {
     meow::core::function_t function_;
     meow::core::module_t module_;

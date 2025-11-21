@@ -2,11 +2,9 @@
 
 #include <cstddef>
 
-namespace meow::core {
-struct MeowObject;
-}
+namespace meow::inline core { struct MeowObject; }
 
-namespace meow::memory {
+namespace meow::inline memory {
 /**
  * @class GarbageCollector
  * @brief Dọn dẹp các object không còn được sử dụng, tránh memory leak

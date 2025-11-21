@@ -16,11 +16,9 @@
 
 #include "utils/types/variant.h"
 
-namespace meow::vm {
-class MeowEngine;
-}
+namespace meow::inline vm { class MeowEngine; }
 
-namespace meow::core::objects {
+namespace meow::inline core::inline objects {
 class ObjNativeFunction : public meow::core::ObjBase<ObjectType::NATIVE_FN> {
    private:
     using engine_t = meow::vm::MeowEngine;

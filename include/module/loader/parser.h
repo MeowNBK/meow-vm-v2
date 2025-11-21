@@ -7,10 +7,8 @@
 #include "runtime/chunk.h"
 #include "core/objects/function.h"
 
-namespace meow::memory {
-class MemoryManager;
-}
-namespace meow::loader {
+namespace meow::inline memory { class MemoryManager; }
+namespace meow::inline loader {
 
 enum class ErrCode { OK = 0, UNEXPECTED_TOKEN, INVALID_NUMBER, OUT_OF_RANGE, INVALID_IDENT, MISSING_DIRECTIVE, LABEL_NOT_FOUND, TOO_MANY_CONST, INTERNAL_ERROR };
 

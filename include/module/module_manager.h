@@ -4,14 +4,10 @@
 #include "core/objects/module.h"
 #include "core/type.h"
 
-namespace meow::vm {
-class MeowEngine;
-}
-namespace meow::memory {
-class MemoryManager;
-}
+namespace meow::inline vm { class MeowEngine; }
+namespace meow::inline memory { class MemoryManager; }
 
-namespace meow::module {
+namespace meow::inline module {
 class ModuleManager {
    public:
     explicit ModuleManager(meow::memory::MemoryManager* heap, meow::vm::MeowEngine* engine) noexcept;

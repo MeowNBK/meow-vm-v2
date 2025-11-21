@@ -1,6 +1,6 @@
 #pragma once
 
-namespace meow::loader {
+namespace meow::inline loader {
 enum class TokenType {
     // Directives
     DIR_FUNC,       // .func

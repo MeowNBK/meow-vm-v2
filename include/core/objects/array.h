@@ -15,7 +15,7 @@
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::core::objects {
+namespace meow::inline core::inline objects {
 class ObjArray : public meow::core::ObjBase<ObjectType::ARRAY> {
    private:
     using container_t = std::vector<meow::core::value_t>;

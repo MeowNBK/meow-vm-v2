@@ -1,7 +1,7 @@
 #include "module/loader/lexer.h"
 #include "core/op_codes.h"
 
-namespace meow::loader {
+namespace meow::inline loader {
 
 static const std::unordered_map<std::string_view, TokenType> DIRECTIVES = {
     {".func", TokenType::DIR_FUNC},

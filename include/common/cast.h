@@ -6,7 +6,7 @@
 #include "core/value.h"
 #include "debug/disassemble.h"
 
-namespace meow::common {
+namespace meow::inline common {
 
 inline int64_t to_int(meow::core::param_t value) noexcept {
     using namespace meow::core;

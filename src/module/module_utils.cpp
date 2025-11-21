@@ -14,7 +14,7 @@
 #endif
 #endif
 
-namespace meow::module {
+namespace meow::inline module {
 
 static inline std::string to_lower_copy(std::string s) noexcept {
     std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });

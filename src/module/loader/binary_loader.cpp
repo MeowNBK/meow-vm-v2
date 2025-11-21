@@ -5,7 +5,7 @@
 #include "core/value.h"
 #include "runtime/chunk.h"
 
-namespace meow::loader {
+namespace meow::inline loader {
 
 using namespace meow::core;
 using namespace meow::runtime;

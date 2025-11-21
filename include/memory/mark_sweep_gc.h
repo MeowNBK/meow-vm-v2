@@ -5,12 +5,12 @@
 #include "memory/garbage_collector.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::runtime {
+namespace meow::inline runtime {
 struct ExecutionContext;
 struct BuiltinRegistry;
 }  // namespace meow::runtime
 
-namespace meow::memory {
+namespace meow::inline memory {
 struct GCMetadata {
     bool is_marked_ = false;
 };

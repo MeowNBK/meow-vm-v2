@@ -2,7 +2,7 @@
 
 #include "common/pch.h"
 
-namespace meow::utils::string {
+namespace meow::inline utils::inline string {
     struct StringHash {
         using is_transparent = void;
         

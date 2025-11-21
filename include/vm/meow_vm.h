@@ -3,15 +3,15 @@
 #include "common/pch.h"
 #include "vm/meow_engine.h"
 
-namespace meow::runtime {
+namespace meow::inline runtime {
     struct ExecutionContext;
     struct BuiltinRegistry;
     class OperatorDispatcher;
 }
-namespace meow::memory { class MemoryManager; }
-namespace meow::module { class ModuleManager; }
+namespace meow::inline memory { class MemoryManager; }
+namespace meow::inline module { class ModuleManager; }
 
-namespace meow::vm {
+namespace meow::inline vm {
 struct VMError : public std::runtime_error {
     explicit VMError(const std::string& message) : std::runtime_error(message) {}
 };
