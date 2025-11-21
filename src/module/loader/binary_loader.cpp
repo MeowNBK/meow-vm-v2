@@ -56,27 +56,28 @@ uint32_t BinaryLoader::read_u32() {
     return val;
 }
 
-uint64_t BinaryLoader::read_u64() {
-    check_can_read(8);
-    uint64_t val = 0;
-    for (int i = 0; i < 8; ++i) {
-        val |= (static_cast<uint64_t>(data_[cursor_ + i]) << (i * 8));
-    }
-    cursor_ += 8;
-    return val;
-}
-
 // uint64_t BinaryLoader::read_u64() {
 //     check_can_read(8);
-//     uint64_t val;
-//     std::memcpy(&val, data_.data() + cursor_, 8);
-//     cursor_ += 8;
-
-//     if constexpr (std::endian::native == std::endian::big) {
-//         val = std::byteswap(val);
+//     uint64_t val = 0;
+//     for (int i = 0; i < 8; ++i) {
+//         val |= (static_cast<uint64_t>(data_[cursor_ + i]) << (i * 8));
 //     }
+//     cursor_ += 8;
 //     return val;
 // }
+
+uint64_t BinaryLoader::read_u64() {
+    check_can_read(8);
+    uint64_t val;
+    std::memcpy(&val, &data_[cursor_], 8); 
+    cursor_ += 8;
+
+    if constexpr (std::endian::native == std::endian::big) {
+        return std::byteswap(val);
+    } else {
+        return val;
+    }
+}
 
 double BinaryLoader::read_f64() {
     return std::bit_cast<double>(read_u64());
@@ -167,7 +168,7 @@ void BinaryLoader::link_prototypes() {
             
             if (constant_ref.is_string()) {
                 std::string_view s = constant_ref.as_string()->c_str();
-                if (s.rfind(ref_prefix, 0) == 0) {
+                if (s.starts_with(ref_prefix)) {
                     uint32_t proto_index = std::stoul(std::string(s.substr(ref_prefix.size())));
                     if (proto_index >= loaded_protos_.size()) {
                         throw BinaryLoaderError("Invalid prototype reference in constant pool.");

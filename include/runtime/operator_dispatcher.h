@@ -45,6 +45,10 @@ public:
         auto right_type = get_value_type(right);
         return unary_dispatch_table_[+op_code][+right_type];
     }
+
+    // [[nodiscard]] inline binary_function_t operator[](core::OpCode op, core::ValueType lhs, core::ValueType rhs) const noexcept {
+    //     return binary_dispatch_table_[+op][+lhs][+rhs];
+    // }
 private:
     [[maybe_unused]] memory::MemoryManager* heap_;
     binary_function_t binary_dispatch_table_[NUM_OPCODES][NUM_VALUE_TYPES][NUM_VALUE_TYPES];

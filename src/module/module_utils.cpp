@@ -82,7 +82,7 @@ std::string read_first_non_empty_line_trimmed(const std::filesystem::path& path)
 }
 
 std::string expand_token(const std::string& raw, const std::string& token, const std::filesystem::path& replacement) noexcept {
-    if (token.empty() || raw.find(token) == std::string::npos) return raw;
+    if (token.empty() || !raw.contains(token)) return raw;
     std::string out;
     out.reserve(raw.size() + replacement.string().size());
     size_t pos = 0;

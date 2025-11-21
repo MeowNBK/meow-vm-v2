@@ -1,6 +1,7 @@
 // --- Old codes ---
 
 #include <iostream>
+#include <print>
 #include "vm/machine.h"
 
 int main(int argc, char* argv[]) {
@@ -10,10 +11,12 @@ int main(int argc, char* argv[]) {
         meow::vm::Machine vm(".", "main.meow", argc, argv);
         vm.interpret();
     } catch (const meow::vm::VMError& e) {
-        std::cerr << "VM Runtime Error: " << e.what() << std::endl;
+        // std::cerr << "VM Runtime Error: " << e.what() << std::endl;
+        std::println(stderr, "VM Runtime Error: ", e.what());
         return 1;
     } catch (const std::exception& e) {
-        std::cerr << "An unexpected error occurred: " << e.what() << std::endl;
+        // std::cerr << "An unexpected error occurred: " << e.what() << std::endl;
+        std::println(stderr, "An unexpected error occurred: ", e.what());
         return 1;
     }
 

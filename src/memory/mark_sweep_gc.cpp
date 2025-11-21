@@ -2,11 +2,15 @@
 #include "core/value.h"
 #include "runtime/builtin_registry.h"
 #include "runtime/execution_context.h"
+#include <print>
 
 namespace meow::inline memory {
 
 MarkSweepGC::~MarkSweepGC() noexcept {
     std::cout << "[destroy] Đang xử lí các object khi hủy GC" << std::endl;
+
+    // speed doesn't matter for debug here
+    // std::println("[destroy] Đang xử lí các object khi hủy GC");
     for (auto const& [obj, data] : metadata_) {
         delete obj;
     }
@@ -14,11 +18,13 @@ MarkSweepGC::~MarkSweepGC() noexcept {
 
 void MarkSweepGC::register_object(const meow::MeowObject* object) {
     std::cout << "[register] Đang đăng kí object: " << object << std::endl;
+    // std::println("[register] Đang đăng kí object: ", object);
     metadata_.emplace(object, GCMetadata{});
 }
 
 size_t MarkSweepGC::collect() noexcept {
     std::cout << "[collect] Đang collect các object" << std::endl;
+    // std::println("[collect] Đang collect các object");
 
     context_->trace(*this);
     builtins_->trace(*this);
