@@ -71,15 +71,20 @@ using namespace meow::common;
         DISPATCH(); \
     }
 
-#define DISPATCH()                                           \
+// #define DISPATCH()                                           \
+//     do {                                                          \
+//         context_->current_frame_->ip_ = ip;                       \
+//         uint8_t instruction = READ_BYTE();                        \
+//         goto *dispatch_table[instruction];                         \
+//     } while (0)
+
+#define DISPATCH()                                                \
     do {                                                          \
         context_->current_frame_->ip_ = ip;                       \
         uint8_t instruction = READ_BYTE();                        \
-        goto *dispatch_table[instruction];                         \
+        [[assume(instruction < static_cast<size_t>(OpCode::TOTAL_OPCODES))]]; \
+        goto *dispatch_table[instruction];                        \
     } while (0)
-
-
-// === SỬA LỖI: Di chuyển các hàm helper lên trên ===
 
 inline bool is_truthy(param_t value) noexcept {
     if (value.is_null()) return false;
