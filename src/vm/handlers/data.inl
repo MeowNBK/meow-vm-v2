@@ -1,7 +1,7 @@
 #pragma once
 // Chứa các handler cho Array, Hash, Index
 
-inline void MeowVM::op_new_array(const uint8_t*& ip) {
+inline void Machine::op_new_array(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t start_idx = READ_U16();
     uint16_t count = READ_U16();
@@ -15,7 +15,7 @@ inline void MeowVM::op_new_array(const uint8_t*& ip) {
     printl("is_array(): {}", REGISTER(dst).is_array());
 }
 
-inline void MeowVM::op_new_hash(const uint8_t*& ip) {
+inline void Machine::op_new_hash(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t start_idx = READ_U16();
     uint16_t count = READ_U16();
@@ -31,7 +31,7 @@ inline void MeowVM::op_new_hash(const uint8_t*& ip) {
     REGISTER(dst) = Value(hash_table);
 }
 
-inline void MeowVM::op_get_index(const uint8_t*& ip) {
+inline void Machine::op_get_index(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t src_reg = READ_U16();
     uint16_t key_reg = READ_U16();
@@ -66,7 +66,7 @@ inline void MeowVM::op_get_index(const uint8_t*& ip) {
     }
 }
 
-inline void MeowVM::op_set_index(const uint8_t*& ip) {
+inline void Machine::op_set_index(const uint8_t*& ip) {
     uint16_t src_reg = READ_U16();
     uint16_t key_reg = READ_U16();
     uint16_t val_reg = READ_U16();
@@ -91,7 +91,7 @@ inline void MeowVM::op_set_index(const uint8_t*& ip) {
     }
 }
 
-inline void MeowVM::op_get_keys(const uint8_t*& ip) {
+inline void Machine::op_get_keys(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t src_reg = READ_U16();
     Value& src = REGISTER(src_reg);
@@ -119,7 +119,7 @@ inline void MeowVM::op_get_keys(const uint8_t*& ip) {
     REGISTER(dst) = Value(keys_array);
 }
 
-inline void MeowVM::op_get_values(const uint8_t*& ip) {
+inline void Machine::op_get_values(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t src_reg = READ_U16();
     Value& src = REGISTER(src_reg);

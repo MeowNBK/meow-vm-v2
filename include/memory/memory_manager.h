@@ -20,8 +20,8 @@ public:
     [[nodiscard]] meow::proto_t new_proto(size_t registers, size_t upvalues, meow::string_t name, meow::Chunk&& chunk, std::vector<meow::objects::UpvalueDesc>&& descs) noexcept;
     [[nodiscard]] meow::function_t new_function(meow::proto_t proto) noexcept;
     [[nodiscard]] meow::module_t new_module(meow::string_t file_name, meow::string_t file_path, meow::proto_t main_proto = nullptr) noexcept;
-    [[nodiscard]] meow::native_fn_t new_native(meow::objects::ObjNativeFunction::native_fn_simple fn) noexcept;
-    [[nodiscard]] meow::native_fn_t new_native(meow::objects::ObjNativeFunction::native_fn_double fn) noexcept;
+    // [[nodiscard]] meow::native_fn_t new_native(meow::objects::ObjNativeFunction::native_fn_simple fn) noexcept;
+    // [[nodiscard]] meow::native_fn_t new_native(meow::objects::ObjNativeFunction::native_fn_double fn) noexcept;
     [[nodiscard]] meow::class_t new_class(meow::string_t name = nullptr) noexcept;
     [[nodiscard]] meow::instance_t new_instance(meow::class_t klass) noexcept;
     [[nodiscard]] meow::bound_method_t new_bound_method(meow::instance_t instance, meow::function_t function) noexcept;

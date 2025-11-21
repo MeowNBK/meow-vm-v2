@@ -1,7 +1,7 @@
 #pragma once
 // Chứa các handler cho Global, Upvalue, Closure
 
-inline void MeowVM::op_get_global(const uint8_t*& ip) {
+inline void Machine::op_get_global(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t name_idx = READ_U16();
     string_t name = CONSTANT(name_idx).as_string();
@@ -13,7 +13,7 @@ inline void MeowVM::op_get_global(const uint8_t*& ip) {
     }
 }
 
-inline void MeowVM::op_set_global(const uint8_t*& ip) {
+inline void Machine::op_set_global(const uint8_t*& ip) {
     uint16_t name_idx = READ_U16();
     uint16_t src = READ_U16();
     string_t name = CONSTANT(name_idx).as_string();
@@ -21,7 +21,7 @@ inline void MeowVM::op_set_global(const uint8_t*& ip) {
     module->set_global(name, REGISTER(src));
 }
 
-inline void MeowVM::op_get_upvalue(const uint8_t*& ip) {
+inline void Machine::op_get_upvalue(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t uv_idx = READ_U16();
     upvalue_t uv = context_->current_frame_->function_->get_upvalue(uv_idx);
@@ -32,7 +32,7 @@ inline void MeowVM::op_get_upvalue(const uint8_t*& ip) {
     }
 }
 
-inline void MeowVM::op_set_upvalue(const uint8_t*& ip) {
+inline void Machine::op_set_upvalue(const uint8_t*& ip) {
     uint16_t uv_idx = READ_U16();
     uint16_t src = READ_U16();
     upvalue_t uv = context_->current_frame_->function_->get_upvalue(uv_idx);
@@ -43,7 +43,7 @@ inline void MeowVM::op_set_upvalue(const uint8_t*& ip) {
     }
 }
 
-inline void MeowVM::op_closure(const uint8_t*& ip) {
+inline void Machine::op_closure(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t proto_idx = READ_U16();
     proto_t proto = CONSTANT(proto_idx).as_proto();
@@ -59,7 +59,7 @@ inline void MeowVM::op_closure(const uint8_t*& ip) {
     REGISTER(dst) = Value(closure);
 }
 
-inline void MeowVM::op_close_upvalues(const uint8_t*& ip) {
+inline void Machine::op_close_upvalues(const uint8_t*& ip) {
     uint16_t last_reg = READ_U16();
     close_upvalues(context_.get(), context_->current_base_ + last_reg);
 }

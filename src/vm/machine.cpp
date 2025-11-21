@@ -1,4 +1,4 @@
-#include "vm/meow_vm.h"
+#include "vm/machine.h"
 #include "common/pch.h"
 #include "core/op_codes.h"
 #include "memory/mark_sweep_gc.h"
@@ -133,7 +133,7 @@ inline void close_upvalues(ExecutionContext* context, size_t last_index) noexcep
 
 // === Bắt đầu phần code logic của meow_vm.cpp ===
 
-MeowVM::MeowVM(const std::string& entry_point_directory, const std::string& entry_path, int argc, char* argv[]) {
+Machine::Machine(const std::string& entry_point_directory, const std::string& entry_path, int argc, char* argv[]) {
     args_.entry_point_directory_ = entry_point_directory;
     args_.entry_path_ = entry_path;
     for (int i = 0; i < argc; ++i) {
@@ -150,12 +150,12 @@ MeowVM::MeowVM(const std::string& entry_point_directory, const std::string& entr
     mod_manager_ = std::make_unique<meow::ModuleManager>(heap_.get(), this);
     op_dispatcher_ = std::make_unique<OperatorDispatcher>(heap_.get());
 
-    printl("MeowVM initialized successfully!");
+    printl("Machine initialized successfully!");
     std::cout << "[log] Detected size of value is: " << std::to_string(sizeof(value_t)) << "\n";
 }
 
-MeowVM::~MeowVM() noexcept {
-    printl("MeowVM shutting down.");
+Machine::~Machine() noexcept {
+    printl("Machine shutting down.");
 }
 
 [[nodiscard]] inline uint8_t to_byte(OpCode op_code) noexcept {
@@ -175,7 +175,7 @@ using raw_value_t = meow::variant<OpCode, uint64_t, double, int64_t, uint16_t>;
     return chunk;
 }
 
-void MeowVM::interpret() noexcept {
+void Machine::interpret() noexcept {
     try {
         prepare();
         run();
@@ -184,7 +184,7 @@ void MeowVM::interpret() noexcept {
     }
 }
 
-void MeowVM::prepare() noexcept {
+void Machine::prepare() noexcept {
     printl("Preparing for execution...");
 
     using u16 = uint16_t;
@@ -220,8 +220,8 @@ void MeowVM::prepare() noexcept {
 
 // --- HÀM RUN() CHÍNH (ĐÃ TÁI CẤU TRÚC) ---
 
-void MeowVM::run() {
-    printl("Starting MeowVM execution loop (Computed Goto)...");
+void Machine::run() {
+    printl("Starting Machine execution loop (Computed Goto)...");
 
 #if !defined(__GNUC__) && !defined(__clang__)
     throw_vm_error("Computed goto dispatch loop requires GCC or Clang.");
@@ -473,20 +473,20 @@ dispatch_start:
             }
             Value& callee = REGISTER(fn_reg);
 
-            if (callee.is_native_fn()) {
-                {
-                    native_fn_t native = callee.as_native_fn();
-                    std::vector<Value> args(argc);
-                    for (size_t i = 0; i < argc; ++i) {
-                        args[i] = REGISTER(arg_start + i);
-                    }
-                    Value result = native->call(this, args);
-                    if (ret_reg != static_cast<size_t>(-1)) {
-                        REGISTER(dst) = result;
-                    }
-                }
-                DISPATCH();
-            }
+            // if (callee.is_native_fn()) {
+            //     {
+            //         native_fn_t native = callee.as_native_fn();
+            //         std::vector<Value> args(argc);
+            //         for (size_t i = 0; i < argc; ++i) {
+            //             args[i] = REGISTER(arg_start + i);
+            //         }
+            //         Value result = native->call(this, args);
+            //         if (ret_reg != static_cast<size_t>(-1)) {
+            //             REGISTER(dst) = result;
+            //         }
+            //     }
+            //     DISPATCH();
+            // }
 
             instance_t self = nullptr;
             function_t closure_to_call = nullptr;

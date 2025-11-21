@@ -1,17 +1,18 @@
 #pragma once
 
 #include "common/pch.h"
+#include <print>
 
-namespace meow::debug {
+namespace meow::inline debug {
     
 template <typename... Args>
-inline void print(const std::format_string<Args...> fmt, Args&&... args) {
-    std::cout << "[log] " << std::format(fmt, std::forward<Args>(args)...);
+inline void print(std::format_string<Args...> fmt, Args&&... args) {
+    std::print(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template <typename... Args>
-inline void printl(const std::format_string<Args...> fmt, Args&&... args) {
-    std::cout << "[log] " << std::format(fmt, std::forward<Args>(args)...) << '\n';
+inline void printl(std::format_string<Args...> fmt, Args&&... args) {
+    std::println(stdout, fmt, std::forward<Args>(args)...);
 }
 
 }

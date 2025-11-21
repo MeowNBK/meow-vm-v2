@@ -8,7 +8,7 @@
 
 namespace meow::inline core {
 
-using base_t = meow::variant<null_t, bool_t, int_t, float_t, object_t>;
+using base_t = meow::variant<null_t, bool_t, int_t, float_t, native_fn_t, object_t>;
 
 class Value {
 private:
@@ -63,6 +63,7 @@ public:
     [[nodiscard]] inline bool is_bool() const noexcept { return data_.holds<bool_t>(); }
     [[nodiscard]] inline bool is_int() const noexcept { return data_.holds<int_t>(); }
     [[nodiscard]] inline bool is_float() const noexcept { return data_.holds<float_t>(); }
+    [[nodiscard]] inline bool is_native_fn() const noexcept { return data_.holds<native_fn_t>(); }
 
     // --- Object type (genreric) ---
     [[nodiscard]] inline bool is_object() const noexcept {
@@ -94,10 +95,10 @@ public:
         const MeowObject* obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::FUNCTION);
     }
-    [[nodiscard]] inline bool is_native_fn() const noexcept {
-        const MeowObject* obj = get_object_ptr();
-        return (obj && obj->get_type() == ObjectType::NATIVE_FN);
-    }
+    // [[nodiscard]] inline bool is_native_fn() const noexcept {
+    //     const MeowObject* obj = get_object_ptr();
+    //     return (obj && obj->get_type() == ObjectType::NATIVE_FN);
+    // }
     [[nodiscard]] inline bool is_class() const noexcept {
         const MeowObject* obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::CLASS);
@@ -119,6 +120,7 @@ public:
     [[nodiscard]] inline bool as_bool() const noexcept { return data_.get<bool_t>(); }
     [[nodiscard]] inline int64_t as_int() const noexcept { return data_.get<int_t>(); }
     [[nodiscard]] inline double as_float() const noexcept { return data_.get<float_t>(); }
+    [[nodiscard]] inline native_fn_t as_native_fn() const noexcept { return data_.get<native_fn_t>(); }
     
     [[nodiscard]] inline meow::MeowObject* as_object() const noexcept {
         return data_.get<object_t>();
@@ -141,9 +143,9 @@ public:
     [[nodiscard]] inline function_t as_function() const noexcept {
         return reinterpret_cast<function_t>(as_object());
     }
-    [[nodiscard]] inline native_fn_t as_native_fn() const noexcept {
-        return reinterpret_cast<native_fn_t>(as_object());
-    }
+    // [[nodiscard]] inline native_fn_t as_native_fn() const noexcept {
+    //     return reinterpret_cast<native_fn_t>(as_object());
+    // }
     [[nodiscard]] inline class_t as_class() const noexcept {
         return reinterpret_cast<class_t>(as_object());
     }
@@ -161,10 +163,16 @@ public:
     [[nodiscard]] inline const bool* as_if_bool() const noexcept { return data_.get_if<bool_t>(); }
     [[nodiscard]] inline const int64_t* as_if_int() const noexcept { return data_.get_if<int_t>(); }
     [[nodiscard]] inline const double* as_if_float() const noexcept { return data_.get_if<float_t>(); }
+    [[nodiscard]] inline const native_fn_t* as_if_native_fn() const noexcept {
+        return data_.get_if<native_fn_t>();
+    }
 
     [[nodiscard]] inline bool* as_if_bool() noexcept { return data_.get_if<bool_t>(); }
     [[nodiscard]] inline int64_t* as_if_int() noexcept { return data_.get_if<int_t>(); }
     [[nodiscard]] inline double* as_if_float() noexcept { return data_.get_if<float_t>(); }
+    [[nodiscard]] inline native_fn_t* as_if_native_fn() noexcept {
+        return data_.get_if<native_fn_t>();
+    }
 
     // Array
     [[nodiscard]] inline array_t as_if_array() noexcept {
@@ -275,22 +283,22 @@ public:
     }
 
     // Native function
-    [[nodiscard]] inline native_fn_t as_if_native_fn() noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::NATIVE_FN) {
-                return reinterpret_cast<native_fn_t>(obj);
-            }
-        }
-        return nullptr;
-    }
-    [[nodiscard]] inline native_fn_t as_if_native_fn() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::NATIVE_FN) {
-                return reinterpret_cast<native_fn_t>(obj);
-            }
-        }
-        return nullptr;
-    }
+    // [[nodiscard]] inline native_fn_t as_if_native_fn() noexcept {
+    //     if (auto obj = get_object_ptr()) {
+    //         if (obj->get_type() == ObjectType::NATIVE_FN) {
+    //             return reinterpret_cast<native_fn_t>(obj);
+    //         }
+    //     }
+    //     return nullptr;
+    // }
+    // [[nodiscard]] inline native_fn_t as_if_native_fn() const noexcept {
+    //     if (auto obj = get_object_ptr()) {
+    //         if (obj->get_type() == ObjectType::NATIVE_FN) {
+    //             return reinterpret_cast<native_fn_t>(obj);
+    //         }
+    //     }
+    //     return nullptr;
+    // }
 
     // Class
     [[nodiscard]] inline class_t as_if_class() noexcept {

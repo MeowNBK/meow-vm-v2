@@ -22,15 +22,15 @@ struct VMArgs {
     std::string entry_path_;
 };
 
-class MeowVM : public MeowEngine {
+class Machine : public MeowEngine {
 public:
     // --- Constructors ---
-    explicit MeowVM(const std::string& entry_point_directory, const std::string& entry_path, int argc, char* argv[]);
-    MeowVM(const MeowVM&) = delete;
-    MeowVM(MeowVM&&) = delete;
-    MeowVM& operator=(const MeowVM&) = delete;
-    MeowVM& operator=(MeowVM&&) = delete;
-    ~MeowVM() noexcept;
+    explicit Machine(const std::string& entry_point_directory, const std::string& entry_path, int argc, char* argv[]);
+    Machine(const Machine&) = delete;
+    Machine(Machine&&) = delete;
+    Machine& operator=(const Machine&) = delete;
+    Machine& operator=(Machine&&) = delete;
+    ~Machine() noexcept;
 
     // --- Public API ---
     void interpret() noexcept;

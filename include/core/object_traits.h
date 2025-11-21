@@ -42,9 +42,9 @@ template <> struct object_traits<objects::ObjFunctionProto> {
 template <> struct object_traits<objects::ObjClosure> {
     static constexpr ObjectType type_tag = ObjectType::FUNCTION;
 };
-template <> struct object_traits<objects::ObjNativeFunction> {
-    static constexpr ObjectType type_tag = ObjectType::NATIVE_FN;
-};
+// template <> struct object_traits<objects::ObjNativeFunction> {
+//     static constexpr ObjectType type_tag = ObjectType::NATIVE_FN;
+// };
 template <> struct object_traits<objects::ObjModule> {
     static constexpr ObjectType type_tag = ObjectType::MODULE;
 };

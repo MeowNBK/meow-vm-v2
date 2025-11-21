@@ -184,8 +184,8 @@ inline std::string object_to_string(meow::object_t obj) noexcept {
             return "<module '" + (name ? std::string(name->c_str()) : "??") + "'>";
         }
 
-        case meow::ObjectType::NATIVE_FN:
-            return "<native_fn>";
+        // case meow::ObjectType::NATIVE_FN:
+        //     return "<native_fn>";
 
         case meow::ObjectType::FUNCTION: {
             auto name = reinterpret_cast<meow::function_t>(obj)->get_proto()->get_name();
@@ -240,6 +240,7 @@ inline std::string to_string(meow::param_t value) noexcept {
             return str;
         },
         [](meow::bool_t val) -> std::string { return val ? "true" : "false"; },
+        [](meow::native_fn_t) -> std::string { return "<native_fn>"; },
         [](meow::object_t obj) -> std::string {
             return detail::object_to_string(obj);
         }

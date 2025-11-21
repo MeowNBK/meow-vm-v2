@@ -3,6 +3,8 @@
 #include "common/pch.h"
 #include "utils/types/variant.h"
 
+namespace meow::inline vm { class Machine; }
+
 namespace meow::inline core::inline objects {
     class ObjString;
     class ObjArray;
@@ -24,6 +26,7 @@ namespace meow::inline core {
     using bool_t = bool;
     using int_t = int64_t;
     using float_t = double;
+    using native_fn_t = value_t (*)(meow::Machine* engine, int argc, value_t* argv);
     
     using object_t = MeowObject*;
     
@@ -36,7 +39,7 @@ namespace meow::inline core {
     using upvalue_t = meow::ObjUpvalue*;
     using proto_t = meow::ObjFunctionProto*;
     using function_t = meow::ObjClosure*;
-    using native_fn_t = meow::ObjNativeFunction*;
+    // using native_fn_t = meow::ObjNativeFunction*;
     using module_t = meow::ObjModule*;
 
     enum class ValueType : uint8_t {
@@ -55,7 +58,7 @@ namespace meow::inline core {
         Upvalue,      // 7  — UPVALUE
         Proto,        // 8  — PROTO
         Function,     // 9  — FUNCTION
-        NativeFn,     // 10 — NATIVE_FN
+        // NativeFn,     // 10 — NATIVE_FN
         Module,       // 11 — MODULE
 
         TotalValueTypes

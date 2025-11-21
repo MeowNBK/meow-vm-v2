@@ -5,7 +5,7 @@ namespace meow::inline memory { struct GCVisitor; }
 namespace meow::inline core {
 
 enum class ObjectType : uint8_t {
-    ARRAY = 5,
+    ARRAY = 6,
     STRING,
     HASH_TABLE,
     INSTANCE,
@@ -14,7 +14,7 @@ enum class ObjectType : uint8_t {
     UPVALUE,
     PROTO,
     FUNCTION,
-    NATIVE_FN,
+    // NATIVE_FN,
     MODULE
 };
 

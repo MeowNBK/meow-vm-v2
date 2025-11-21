@@ -7,7 +7,7 @@
 #include "core/value.h"
 #include "runtime/chunk.h"
 
-namespace meow::debug {
+namespace meow::inline debug {
 
 using meow::OpCode;
 using meow::Value;
@@ -77,6 +77,7 @@ inline std::string disassemble_chunk(const Chunk& chunk) noexcept {
             temp_os << r;
             return temp_os.str();
         }
+        if (value.is_native_fn()) return "<native_fn>";
 
         if (value.is_string()) {
             return "\"" + std::string(value.as_string()->c_str()) + "\"";
@@ -95,7 +96,7 @@ inline std::string disassemble_chunk(const Chunk& chunk) noexcept {
         if (value.is_instance()) return "<instance>";
         if (value.is_bound_method()) return "<bound_method>";
         if (value.is_upvalue()) return "<upvalue>";
-        if (value.is_native_fn()) return "<native_fn>";
+        // if (value.is_native_fn()) return "<native_fn>";
         if (value.is_module()) {
             auto name = value.as_module()->get_file_name();
             return "<module '" + (name ? std::string(name->c_str()) : "??") + "'>";

@@ -1,14 +1,14 @@
 #pragma once
 // Chứa các handler cho Module, Import, Export
 
-inline void MeowVM::op_export(const uint8_t*& ip) {
+inline void Machine::op_export(const uint8_t*& ip) {
     uint16_t name_idx = READ_U16();
     uint16_t src_reg = READ_U16();
     string_t name = CONSTANT(name_idx).as_string();
     context_->current_frame_->module_->set_export(name, REGISTER(src_reg));
 }
 
-inline void MeowVM::op_get_export(const uint8_t*& ip) {
+inline void Machine::op_get_export(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t mod_reg = READ_U16();
     uint16_t name_idx = READ_U16();
@@ -20,7 +20,7 @@ inline void MeowVM::op_get_export(const uint8_t*& ip) {
     REGISTER(dst) = mod->get_export(name);
 }
 
-inline void MeowVM::op_import_all(const uint8_t*& ip) {
+inline void Machine::op_import_all(const uint8_t*& ip) {
     uint16_t src_idx = READ_U16();
     const Value& mod_val = REGISTER(src_idx);
     if (auto src_mod = mod_val.as_if_module()) {

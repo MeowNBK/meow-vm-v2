@@ -55,13 +55,13 @@ module_t MemoryManager::new_module(string_t file_name, string_t file_path, proto
     return new_object<objects::ObjModule>(file_name, file_path, main_proto);
 }
 
-native_fn_t MemoryManager::new_native(objects::ObjNativeFunction::native_fn_simple fn) noexcept {
-    return new_object<objects::ObjNativeFunction>(fn);
-}
+// native_fn_t MemoryManager::new_native(objects::ObjNativeFunction::native_fn_simple fn) noexcept {
+//     return new_object<objects::ObjNativeFunction>(fn);
+// }
 
-native_fn_t MemoryManager::new_native(objects::ObjNativeFunction::native_fn_double fn) noexcept {
-    return new_object<objects::ObjNativeFunction>(fn);
-}
+// native_fn_t MemoryManager::new_native(objects::ObjNativeFunction::native_fn_double fn) noexcept {
+//     return new_object<objects::ObjNativeFunction>(fn);
+// }
 
 class_t MemoryManager::new_class(string_t name) noexcept {
     return new_object<objects::ObjClass>(name);

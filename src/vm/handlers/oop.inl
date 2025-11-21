@@ -1,14 +1,14 @@
 #pragma once
 // Chứa các handler cho Class, Instance, Prop, Method, Inherit, Super
 
-inline void MeowVM::op_new_class(const uint8_t*& ip) {
+inline void Machine::op_new_class(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t name_idx = READ_U16();
     string_t name = CONSTANT(name_idx).as_string();
     REGISTER(dst) = Value(heap_->new_class(name));
 }
 
-inline void MeowVM::op_new_instance(const uint8_t*& ip) {
+inline void Machine::op_new_instance(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t class_reg = READ_U16();
     Value& class_val = REGISTER(class_reg);
@@ -16,7 +16,7 @@ inline void MeowVM::op_new_instance(const uint8_t*& ip) {
     REGISTER(dst) = Value(heap_->new_instance(class_val.as_class()));
 }
 
-inline void MeowVM::op_get_prop(const uint8_t*& ip) {
+inline void Machine::op_get_prop(const uint8_t*& ip) {
     uint16_t dst = READ_U16();
     uint16_t obj_reg = READ_U16();
     uint16_t name_idx = READ_U16();
@@ -47,7 +47,7 @@ inline void MeowVM::op_get_prop(const uint8_t*& ip) {
     REGISTER(dst) = Value(null_t{});
 }
 
-inline void MeowVM::op_set_prop(const uint8_t*& ip) {
+inline void Machine::op_set_prop(const uint8_t*& ip) {
     uint16_t obj_reg = READ_U16();
     uint16_t name_idx = READ_U16();
     uint16_t val_reg = READ_U16();
@@ -61,7 +61,7 @@ inline void MeowVM::op_set_prop(const uint8_t*& ip) {
     }
 }
 
-inline void MeowVM::op_set_method(const uint8_t*& ip) {
+inline void Machine::op_set_method(const uint8_t*& ip) {
     uint16_t call_reg = READ_U16();
     uint16_t name_idx = READ_U16();
     uint16_t method_reg = READ_U16();
@@ -73,7 +73,7 @@ inline void MeowVM::op_set_method(const uint8_t*& ip) {
     class_val.as_class()->set_method(name, methodVal);
 }
 
-inline void MeowVM::op_inherit(const uint8_t*& ip) {
+inline void Machine::op_inherit(const uint8_t*& ip) {
     uint16_t sub_reg = READ_U16();
     uint16_t super_reg = READ_U16();
     Value& sub_val = REGISTER(sub_reg);
@@ -86,7 +86,7 @@ inline void MeowVM::op_inherit(const uint8_t*& ip) {
     sub->set_super(super);
 }
 
-inline void MeowVM::op_get_super(const uint8_t*& ip) {
+inline void Machine::op_get_super(const uint8_t*& ip) {
     uint16_t dst = READ_U16(), name_idx = READ_U16();
     string_t name = CONSTANT(name_idx).as_string();
     Value& receiver_val = REGISTER(0);
