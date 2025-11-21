@@ -66,6 +66,18 @@ uint64_t BinaryLoader::read_u64() {
     return val;
 }
 
+// uint64_t BinaryLoader::read_u64() {
+//     check_can_read(8);
+//     uint64_t val;
+//     std::memcpy(&val, data_.data() + cursor_, 8);
+//     cursor_ += 8;
+
+//     if constexpr (std::endian::native == std::endian::big) {
+//         val = std::byteswap(val);
+//     }
+//     return val;
+// }
+
 double BinaryLoader::read_f64() {
     return std::bit_cast<double>(read_u64());
 }

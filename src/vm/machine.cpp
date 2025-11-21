@@ -723,5 +723,5 @@ dispatch_start:
     }
 
     // Không bao giờ đạt tới đây nếu logic đúng
-    return;
+    std::unreachable();
 }

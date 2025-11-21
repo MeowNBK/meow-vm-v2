@@ -13,11 +13,14 @@ using base_t = meow::variant<null_t, bool_t, int_t, float_t, native_fn_t, object
 class Value {
 private:
     base_t data_;
-    [[nodiscard]] inline meow::MeowObject* get_object_ptr() const noexcept {
-        if (auto obj_ptr = data_.get_if<object_t>()) {
+
+    template <typename Self>
+    [[nodiscard]] inline auto get_object_ptr(this Self&& self) noexcept {
+        if (auto obj_ptr = self.data_.template get_if<object_t>()) {
             return *obj_ptr;
         }
-        return nullptr;
+        using ret_t = std::remove_reference_t<decltype(*std::declval<object_t*>())>;
+        return static_cast<ret_t>(nullptr);
     }
 
 public:
@@ -65,58 +68,54 @@ public:
     [[nodiscard]] inline bool is_float() const noexcept { return data_.holds<float_t>(); }
     [[nodiscard]] inline bool is_native_fn() const noexcept { return data_.holds<native_fn_t>(); }
 
-    // --- Object type (genreric) ---
+    // --- Object type (generic) ---
     [[nodiscard]] inline bool is_object() const noexcept {
         return get_object_ptr() != nullptr;
     }
 
     // --- Specific object type ---
     [[nodiscard]] inline bool is_array() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::ARRAY);
     }
     [[nodiscard]] inline bool is_string() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::STRING);
     }
     [[nodiscard]] inline bool is_hash_table() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::HASH_TABLE);
     }
     [[nodiscard]] inline bool is_upvalue() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::UPVALUE);
     }
     [[nodiscard]] inline bool is_proto() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::PROTO);
     }
     [[nodiscard]] inline bool is_function() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::FUNCTION);
     }
-    // [[nodiscard]] inline bool is_native_fn() const noexcept {
-    //     const MeowObject* obj = get_object_ptr();
-    //     return (obj && obj->get_type() == ObjectType::NATIVE_FN);
-    // }
     [[nodiscard]] inline bool is_class() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::CLASS);
     }
     [[nodiscard]] inline bool is_instance() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::INSTANCE);
     }
     [[nodiscard]] inline bool is_bound_method() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::BOUND_METHOD);
     }
     [[nodiscard]] inline bool is_module() const noexcept {
-        const MeowObject* obj = get_object_ptr();
+        auto obj = get_object_ptr();
         return (obj && obj->get_type() == ObjectType::MODULE);
     }
 
-    // === Accessors ===
+    // === Accessors (Unsafe / By Value) ===
     [[nodiscard]] inline bool as_bool() const noexcept { return data_.get<bool_t>(); }
     [[nodiscard]] inline int64_t as_int() const noexcept { return data_.get<int_t>(); }
     [[nodiscard]] inline double as_float() const noexcept { return data_.get<float_t>(); }
@@ -143,9 +142,6 @@ public:
     [[nodiscard]] inline function_t as_function() const noexcept {
         return reinterpret_cast<function_t>(as_object());
     }
-    // [[nodiscard]] inline native_fn_t as_native_fn() const noexcept {
-    //     return reinterpret_cast<native_fn_t>(as_object());
-    // }
     [[nodiscard]] inline class_t as_class() const noexcept {
         return reinterpret_cast<class_t>(as_object());
     }
@@ -159,220 +155,143 @@ public:
         return reinterpret_cast<module_t>(as_object());
     }
 
-    // === Safe Getters ===
-    [[nodiscard]] inline const bool* as_if_bool() const noexcept { return data_.get_if<bool_t>(); }
-    [[nodiscard]] inline const int64_t* as_if_int() const noexcept { return data_.get_if<int_t>(); }
-    [[nodiscard]] inline const double* as_if_float() const noexcept { return data_.get_if<float_t>(); }
-    [[nodiscard]] inline const native_fn_t* as_if_native_fn() const noexcept {
-        return data_.get_if<native_fn_t>();
+    // === Safe Getters (Deducing 'this' - C++23) ===
+    
+    // --- Primitive Types ---
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_bool(this Self&& self) noexcept {
+        return self.data_.template get_if<bool_t>();
     }
 
-    [[nodiscard]] inline bool* as_if_bool() noexcept { return data_.get_if<bool_t>(); }
-    [[nodiscard]] inline int64_t* as_if_int() noexcept { return data_.get_if<int_t>(); }
-    [[nodiscard]] inline double* as_if_float() noexcept { return data_.get_if<float_t>(); }
-    [[nodiscard]] inline native_fn_t* as_if_native_fn() noexcept {
-        return data_.get_if<native_fn_t>();
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_int(this Self&& self) noexcept {
+        return self.data_.template get_if<int_t>();
     }
 
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_float(this Self&& self) noexcept {
+        return self.data_.template get_if<float_t>();
+    }
+
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_native_fn(this Self&& self) noexcept {
+        return self.data_.template get_if<native_fn_t>();
+    }
+
+    // --- Object Types ---
+    
     // Array
-    [[nodiscard]] inline array_t as_if_array() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_array(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::ARRAY) {
                 return reinterpret_cast<array_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline array_t as_if_array() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::ARRAY) {
-                return reinterpret_cast<array_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<array_t>(nullptr);
     }
 
     // String
-    [[nodiscard]] inline string_t as_if_string() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_string(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::STRING) {
                 return reinterpret_cast<string_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline string_t as_if_string() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::STRING) {
-                return reinterpret_cast<string_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<string_t>(nullptr);
     }
 
     // Hash table
-    [[nodiscard]] inline hash_table_t as_if_hash_table() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_hash_table(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::HASH_TABLE) {
                 return reinterpret_cast<hash_table_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline hash_table_t as_if_hash_table() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::HASH_TABLE) {
-                return reinterpret_cast<hash_table_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<hash_table_t>(nullptr);
     }
 
     // Upvalue
-    [[nodiscard]] inline upvalue_t as_if_upvalue() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_upvalue(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::UPVALUE) {
                 return reinterpret_cast<upvalue_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline upvalue_t as_if_upvalue() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::UPVALUE) {
-                return reinterpret_cast<upvalue_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<upvalue_t>(nullptr);
     }
 
     // Proto
-    [[nodiscard]] inline proto_t as_if_proto() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_proto(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::PROTO) {
                 return reinterpret_cast<proto_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline proto_t as_if_proto() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::PROTO) {
-                return reinterpret_cast<proto_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<proto_t>(nullptr);
     }
 
     // Function
-    [[nodiscard]] inline function_t as_if_function() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_function(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::FUNCTION) {
                 return reinterpret_cast<function_t>(obj);
             }
         }
-        return nullptr;
+        return static_cast<function_t>(nullptr);
     }
-    [[nodiscard]] inline function_t as_if_function() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::FUNCTION) {
-                return reinterpret_cast<function_t>(obj);
-            }
-        }
-        return nullptr;
-    }
-
-    // Native function
-    // [[nodiscard]] inline native_fn_t as_if_native_fn() noexcept {
-    //     if (auto obj = get_object_ptr()) {
-    //         if (obj->get_type() == ObjectType::NATIVE_FN) {
-    //             return reinterpret_cast<native_fn_t>(obj);
-    //         }
-    //     }
-    //     return nullptr;
-    // }
-    // [[nodiscard]] inline native_fn_t as_if_native_fn() const noexcept {
-    //     if (auto obj = get_object_ptr()) {
-    //         if (obj->get_type() == ObjectType::NATIVE_FN) {
-    //             return reinterpret_cast<native_fn_t>(obj);
-    //         }
-    //     }
-    //     return nullptr;
-    // }
 
     // Class
-    [[nodiscard]] inline class_t as_if_class() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_class(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::CLASS) {
                 return reinterpret_cast<class_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline class_t as_if_class() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::CLASS) {
-                return reinterpret_cast<class_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<class_t>(nullptr);
     }
 
     // Instance
-    [[nodiscard]] inline instance_t as_if_instance() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_instance(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::INSTANCE) {
                 return reinterpret_cast<instance_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline instance_t as_if_instance() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::INSTANCE) {
-                return reinterpret_cast<instance_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<instance_t>(nullptr);
     }
 
     // Bound method
-    [[nodiscard]] inline bound_method_t as_if_bound_method() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_bound_method(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::BOUND_METHOD) {
                 return reinterpret_cast<bound_method_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline bound_method_t as_if_bound_method() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::BOUND_METHOD) {
-                return reinterpret_cast<bound_method_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<bound_method_t>(nullptr);
     }
 
     // Module
-    [[nodiscard]] inline module_t as_if_module() noexcept {
-        if (auto obj = get_object_ptr()) {
+    template <typename Self>
+    [[nodiscard]] inline auto as_if_module(this Self&& self) noexcept {
+        if (auto obj = self.get_object_ptr()) {
             if (obj->get_type() == ObjectType::MODULE) {
                 return reinterpret_cast<module_t>(obj);
             }
         }
-        return nullptr;
-    }
-    [[nodiscard]] inline module_t as_if_module() const noexcept {
-        if (auto obj = get_object_ptr()) {
-            if (obj->get_type() == ObjectType::MODULE) {
-                return reinterpret_cast<module_t>(obj);
-            }
-        }
-        return nullptr;
+        return static_cast<module_t>(nullptr);
     }
 
     // === Visitor ===
+    // (Cũng có thể dùng deducing this để gộp, nhưng giữ nguyên cũng tốt)
     template <typename Visitor>
     decltype(auto) visit(Visitor&& vis) {
         return data_.visit(vis);
