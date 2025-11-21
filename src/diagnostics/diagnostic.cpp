@@ -1,6 +1,6 @@
 #include "diagnostics/diagnostic.h"
 
-namespace meow::diagnostics {
+namespace meow::inline diagnostics {
 
 // ============================================================================
 // 🎨 Severity level string table

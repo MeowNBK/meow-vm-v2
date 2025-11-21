@@ -17,11 +17,11 @@
 #include "memory/gc_visitor.h"
 
 namespace meow::inline core::inline objects {
-class ObjHashTable : public meow::core::ObjBase<ObjectType::HASH_TABLE> {
+class ObjHashTable : public meow::ObjBase<ObjectType::HASH_TABLE> {
    private:
-    using key_t = meow::core::string_t;
+    using key_t = meow::string_t;
     using map_t = std::unordered_map<key_t, value_t>;
-    using visitor_t = meow::memory::GCVisitor;
+    using visitor_t = meow::GCVisitor;
 
     map_t fields_;
 
@@ -47,7 +47,7 @@ class ObjHashTable : public meow::core::ObjBase<ObjectType::HASH_TABLE> {
     // --- Lookup ---
 
     // Unchecked lookup. For performance-critical code
-    [[nodiscard]] inline meow::core::return_t get(key_t key) noexcept {
+    [[nodiscard]] inline meow::return_t get(key_t key) noexcept {
         return fields_[key];
     }
     // Unchecked lookup/update. For performance-critical code
@@ -56,7 +56,7 @@ class ObjHashTable : public meow::core::ObjBase<ObjectType::HASH_TABLE> {
         fields_[key] = std::forward<T>(value);
     }
     // Checked lookup. Throws if key is not found
-    [[nodiscard]] inline meow::core::return_t at(key_t key) const {
+    [[nodiscard]] inline meow::return_t at(key_t key) const {
         return fields_.at(key);
     }
     [[nodiscard]] inline bool has(key_t key) const {
@@ -87,4 +87,4 @@ class ObjHashTable : public meow::core::ObjBase<ObjectType::HASH_TABLE> {
 
     void trace(visitor_t& visitor) const noexcept override;
 };
-}  // namespace meow::core::objects
+}  // namespace meow::objects

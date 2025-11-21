@@ -13,7 +13,7 @@ using base_t = meow::variant<null_t, bool_t, int_t, float_t, object_t>;
 class Value {
 private:
     base_t data_;
-    [[nodiscard]] inline meow::core::MeowObject* get_object_ptr() const noexcept {
+    [[nodiscard]] inline meow::MeowObject* get_object_ptr() const noexcept {
         if (auto obj_ptr = data_.get_if<object_t>()) {
             return *obj_ptr;
         }
@@ -120,7 +120,7 @@ public:
     [[nodiscard]] inline int64_t as_int() const noexcept { return data_.get<int_t>(); }
     [[nodiscard]] inline double as_float() const noexcept { return data_.get<float_t>(); }
     
-    [[nodiscard]] inline meow::core::MeowObject* as_object() const noexcept {
+    [[nodiscard]] inline meow::MeowObject* as_object() const noexcept {
         return data_.get<object_t>();
     }
     [[nodiscard]] inline array_t as_array() const noexcept {

@@ -8,23 +8,23 @@
 namespace meow::inline memory {
 class MemoryManager {
 public:
-    explicit MemoryManager(std::unique_ptr<meow::memory::GarbageCollector> gc) noexcept;
+    explicit MemoryManager(std::unique_ptr<meow::GarbageCollector> gc) noexcept;
     ~MemoryManager() noexcept;
-    [[nodiscard]] meow::core::array_t new_array(const std::vector<meow::core::Value>& elements = {}) noexcept;
-    // [[nodiscard]] meow::core::string_t new_string(const std::string& string) noexcept;
-    [[nodiscard]] meow::core::string_t new_string(std::string_view str_view) noexcept;
-    [[nodiscard]] meow::core::string_t new_string(const char* chars, size_t length) noexcept;
-    [[nodiscard]] meow::core::hash_table_t new_hash(const std::unordered_map<meow::core::string_t, meow::core::Value>& fields = {}) noexcept;
-    [[nodiscard]] meow::core::upvalue_t new_upvalue(size_t index) noexcept;
-    [[nodiscard]] meow::core::proto_t new_proto(size_t registers, size_t upvalues, meow::core::string_t name, meow::runtime::Chunk&& chunk) noexcept;
-    [[nodiscard]] meow::core::proto_t new_proto(size_t registers, size_t upvalues, meow::core::string_t name, meow::runtime::Chunk&& chunk, std::vector<meow::core::objects::UpvalueDesc>&& descs) noexcept;
-    [[nodiscard]] meow::core::function_t new_function(meow::core::proto_t proto) noexcept;
-    [[nodiscard]] meow::core::module_t new_module(meow::core::string_t file_name, meow::core::string_t file_path, meow::core::proto_t main_proto = nullptr) noexcept;
-    [[nodiscard]] meow::core::native_fn_t new_native(meow::core::objects::ObjNativeFunction::native_fn_simple fn) noexcept;
-    [[nodiscard]] meow::core::native_fn_t new_native(meow::core::objects::ObjNativeFunction::native_fn_double fn) noexcept;
-    [[nodiscard]] meow::core::class_t new_class(meow::core::string_t name = nullptr) noexcept;
-    [[nodiscard]] meow::core::instance_t new_instance(meow::core::class_t klass) noexcept;
-    [[nodiscard]] meow::core::bound_method_t new_bound_method(meow::core::instance_t instance, meow::core::function_t function) noexcept;
+    [[nodiscard]] meow::array_t new_array(const std::vector<meow::Value>& elements = {}) noexcept;
+    // [[nodiscard]] meow::string_t new_string(const std::string& string) noexcept;
+    [[nodiscard]] meow::string_t new_string(std::string_view str_view) noexcept;
+    [[nodiscard]] meow::string_t new_string(const char* chars, size_t length) noexcept;
+    [[nodiscard]] meow::hash_table_t new_hash(const std::unordered_map<meow::string_t, meow::Value>& fields = {}) noexcept;
+    [[nodiscard]] meow::upvalue_t new_upvalue(size_t index) noexcept;
+    [[nodiscard]] meow::proto_t new_proto(size_t registers, size_t upvalues, meow::string_t name, meow::Chunk&& chunk) noexcept;
+    [[nodiscard]] meow::proto_t new_proto(size_t registers, size_t upvalues, meow::string_t name, meow::Chunk&& chunk, std::vector<meow::objects::UpvalueDesc>&& descs) noexcept;
+    [[nodiscard]] meow::function_t new_function(meow::proto_t proto) noexcept;
+    [[nodiscard]] meow::module_t new_module(meow::string_t file_name, meow::string_t file_path, meow::proto_t main_proto = nullptr) noexcept;
+    [[nodiscard]] meow::native_fn_t new_native(meow::objects::ObjNativeFunction::native_fn_simple fn) noexcept;
+    [[nodiscard]] meow::native_fn_t new_native(meow::objects::ObjNativeFunction::native_fn_double fn) noexcept;
+    [[nodiscard]] meow::class_t new_class(meow::string_t name = nullptr) noexcept;
+    [[nodiscard]] meow::instance_t new_instance(meow::class_t klass) noexcept;
+    [[nodiscard]] meow::bound_method_t new_bound_method(meow::instance_t instance, meow::function_t function) noexcept;
 
     inline void enable_gc() noexcept {
         gc_enabled_ = true;
@@ -44,8 +44,8 @@ private:
         size_t operator()(const std::string& txt) const { return std::hash<std::string>{}(txt); }
     };
 
-    std::unique_ptr<meow::memory::GarbageCollector> gc_;
-    std::unordered_map<std::string, meow::core::string_t, StringHash, std::equal_to<>> string_pool_;
+    std::unique_ptr<meow::GarbageCollector> gc_;
+    std::unordered_map<std::string, meow::string_t, StringHash, std::equal_to<>> string_pool_;
 
     size_t gc_threshold_;
     size_t object_allocated_;
@@ -58,12 +58,12 @@ private:
             gc_threshold_ *= 2;
         }
         T* new_object = new T(std::forward<Args>(args)...);
-        gc_->register_object(static_cast<meow::core::MeowObject*>(new_object));
+        gc_->register_object(static_cast<meow::MeowObject*>(new_object));
         ++object_allocated_;
         return new_object;
     }
 
-    inline void register_object(const meow::core::MeowObject* object) noexcept {
+    inline void register_object(const meow::MeowObject* object) noexcept {
         if (!object) return;
         if (object_allocated_ >= gc_threshold_ && gc_enabled_) {
             collect();

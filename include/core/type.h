@@ -15,7 +15,7 @@ namespace meow::inline core::inline objects {
     class ObjNativeFunction;
     class ObjClosure;
     class ObjModule;
-}  // namespace meow::core::objects
+}  // namespace meow::objects
 
 namespace meow::inline core {
     struct MeowObject;

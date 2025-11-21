@@ -10,7 +10,7 @@ namespace meow::inline loader {
 using namespace meow::core;
 using namespace meow::runtime;
 using namespace meow::memory;
-using namespace meow::core::objects;
+using namespace meow::objects;
 
 constexpr uint32_t MAGIC_NUMBER = 0x4D454F57; // "MEOW"
 constexpr uint32_t FORMAT_VERSION = 1;

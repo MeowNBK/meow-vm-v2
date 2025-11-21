@@ -9,11 +9,11 @@
 
 namespace meow::debug {
 
-using meow::core::OpCode;
-using meow::core::Value;
-using meow::runtime::Chunk;
+using meow::OpCode;
+using meow::Value;
+using meow::Chunk;
 
-static constexpr std::array<std::string_view, static_cast<size_t>(meow::core::OpCode::TOTAL_OPCODES)> opcode_strings = {
+static constexpr std::array<std::string_view, static_cast<size_t>(meow::OpCode::TOTAL_OPCODES)> opcode_strings = {
     "LOAD_CONST", "LOAD_NULL",     "LOAD_TRUE",     "LOAD_FALSE", "LOAD_INT",   "LOAD_FLOAT",   "MOVE",        "ADD",       "SUB",
     "MUL",        "DIV",           "MOD",           "POW",        "EQ",         "NEQ",          "GT",          "GE",        "LT",
     "LE",         "NEG",           "NOT",           "GET_GLOBAL", "SET_GLOBAL", "GET_UPVALUE",  "SET_UPVALUE", "CLOSURE",   "CLOSE_UPVALUES",

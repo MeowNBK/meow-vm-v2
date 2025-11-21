@@ -8,12 +8,12 @@
 
 namespace meow::inline runtime {
 struct CallFrame {
-    meow::core::function_t function_;
-    meow::core::module_t module_;
+    meow::function_t function_;
+    meow::module_t module_;
     size_t start_reg_;
     size_t ret_reg_;
     const uint8_t* ip_;
-    CallFrame(meow::core::function_t function, meow::core::module_t module, size_t start_reg, size_t ret_reg, const uint8_t* ip)
+    CallFrame(meow::function_t function, meow::module_t module, size_t start_reg, size_t ret_reg, const uint8_t* ip)
         : function_(function), module_(module), start_reg_(start_reg), ret_reg_(ret_reg), ip_(ip) {
     }
 };
@@ -28,8 +28,8 @@ struct ExceptionHandler {
 
 struct ExecutionContext {
     std::vector<CallFrame> call_stack_;
-    std::vector<meow::core::Value> registers_;
-    std::vector<meow::core::upvalue_t> open_upvalues_;
+    std::vector<meow::Value> registers_;
+    std::vector<meow::upvalue_t> open_upvalues_;
     std::vector<ExceptionHandler> exception_handlers_;
 
     size_t current_base_ = 0;
@@ -42,7 +42,7 @@ struct ExecutionContext {
         exception_handlers_.clear();
     }
 
-    inline void trace(meow::memory::GCVisitor& visitor) const noexcept {
+    inline void trace(meow::GCVisitor& visitor) const noexcept {
         for (const auto& reg : registers_) {
             visitor.visit_value(reg);
         }

@@ -11,8 +11,8 @@ static const std::unordered_map<std::string_view, TokenType> DIRECTIVES = {
     {".upvalue", TokenType::DIR_UPVALUE}, {".const", TokenType::DIR_CONST}
 };
 
-static const std::array<std::string_view, static_cast<size_t>(meow::core::OpCode::TOTAL_OPCODES)> OPCODES = [] {
-    std::array<std::string_view, static_cast<size_t>(meow::core::OpCode::TOTAL_OPCODES)> array = {
+static const std::array<std::string_view, static_cast<size_t>(meow::OpCode::TOTAL_OPCODES)> OPCODES = [] {
+    std::array<std::string_view, static_cast<size_t>(meow::OpCode::TOTAL_OPCODES)> array = {
         "LOAD_CONST", "LOAD_NULL",     "LOAD_TRUE",     "LOAD_FALSE", "LOAD_INT",   "LOAD_FLOAT",   "MOVE",        "ADD",       "SUB",
         "MUL",        "DIV",           "MOD",           "POW",        "EQ",         "NEQ",          "GT",          "GE",        "LT",
         "LE",         "NEG",           "NOT",           "GET_GLOBAL", "SET_GLOBAL", "GET_UPVALUE",  "SET_UPVALUE", "CLOSURE",   "CLOSE_UPVALUES",

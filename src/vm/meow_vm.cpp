@@ -143,11 +143,11 @@ MeowVM::MeowVM(const std::string& entry_point_directory, const std::string& entr
     context_ = std::make_unique<ExecutionContext>();
     builtins_ = std::make_unique<BuiltinRegistry>();
 
-    auto gc = std::make_unique<meow::memory::MarkSweepGC>(context_.get(), builtins_.get());
+    auto gc = std::make_unique<meow::MarkSweepGC>(context_.get(), builtins_.get());
 
-    heap_ = std::make_unique<meow::memory::MemoryManager>(std::move(gc));
+    heap_ = std::make_unique<meow::MemoryManager>(std::move(gc));
 
-    mod_manager_ = std::make_unique<meow::module::ModuleManager>(heap_.get(), this);
+    mod_manager_ = std::make_unique<meow::ModuleManager>(heap_.get(), this);
     op_dispatcher_ = std::make_unique<OperatorDispatcher>(heap_.get());
 
     printl("MeowVM initialized successfully!");
@@ -360,8 +360,28 @@ dispatch_start:
             DISPATCH();
         }
 
-        // --- Các Op Handler dùng Macro (Giữ nguyên) ---
-        BINARY_OP_HANDLER(ADD,     "ADD")
+        op_ADD: {
+            uint16_t dst = READ_U16();
+            uint16_t r1  = READ_U16();
+            uint16_t r2  = READ_U16();
+            
+            auto& left  = REGISTER(r1);
+            auto& right = REGISTER(r2);
+            if ((__builtin_expect(!!(left.is_int() && right.is_int()), 1))) {
+                REGISTER(dst) = value_t(left.as_int() + right.as_int());
+            } else if (left.is_float() && right.is_float()) {
+                REGISTER(dst) = value_t(left.as_float() + right.as_float());
+            } else {                
+                if (auto func = op_dispatcher_->find(OpCode::ADD, left, right)) {
+                    REGISTER(dst) = func(left, right);
+                } else {
+                    throw_vm_error("Unsupported binary operator ADD");
+                }
+            }
+            DISPATCH();
+        }
+
+        // BINARY_OP_HANDLER(ADD,     "ADD")
         BINARY_OP_HANDLER(SUB,     "SUB")
         BINARY_OP_HANDLER(MUL,     "MUL")
         BINARY_OP_HANDLER(DIV,     "DIV")

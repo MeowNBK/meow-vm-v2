@@ -36,11 +36,11 @@ public:
     void interpret() noexcept;
 private:
     // --- Subsystems ---
-    std::unique_ptr<meow::runtime::ExecutionContext> context_;
-    std::unique_ptr<meow::runtime::BuiltinRegistry> builtins_;
-    std::unique_ptr<meow::memory::MemoryManager> heap_;
-    std::unique_ptr<meow::module::ModuleManager> mod_manager_;
-    std::unique_ptr<meow::runtime::OperatorDispatcher> op_dispatcher_;
+    std::unique_ptr<meow::ExecutionContext> context_;
+    std::unique_ptr<meow::BuiltinRegistry> builtins_;
+    std::unique_ptr<meow::MemoryManager> heap_;
+    std::unique_ptr<meow::ModuleManager> mod_manager_;
+    std::unique_ptr<meow::OperatorDispatcher> op_dispatcher_;
 
     // --- Runtime arguments ---
     VMArgs args_;

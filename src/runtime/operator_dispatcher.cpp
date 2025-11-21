@@ -8,7 +8,7 @@ using namespace meow::core;
     binary_dispatch_table_[+OpCode::opcode][+ValueType::type1][+ValueType::type2] = [](param_t lhs, param_t rhs) -> return_t
 #define UNARY(opcode, type) unary_dispatch_table_[+OpCode::opcode][+ValueType::type] = [](param_t rhs) -> return_t
 
-OperatorDispatcher::OperatorDispatcher(meow::memory::MemoryManager* heap) noexcept : heap_(heap) {
+OperatorDispatcher::OperatorDispatcher(meow::MemoryManager* heap) noexcept : heap_(heap) {
     for (size_t op_code = 0; op_code < NUM_OPCODES; ++op_code) {
         for (size_t type1 = 0; type1 < NUM_VALUE_TYPES; ++type1) {
             unary_dispatch_table_[op_code][type1] = nullptr;
@@ -34,7 +34,7 @@ OperatorDispatcher::OperatorDispatcher(meow::memory::MemoryManager* heap) noexce
         // but dispatch table need function pointer
         // return Value(heap_->new_string(std::string(lhs.as_string()->c_str()) + rhs.as_string()->c_str()));
         // TODO: Change this later
-        auto str = new meow::core::objects::ObjString(std::string(lhs.as_string()->c_str()) + rhs.as_string()->c_str());
+        auto str = new meow::ObjString(std::string(lhs.as_string()->c_str()) + rhs.as_string()->c_str());
         return Value(str);
     };
 }

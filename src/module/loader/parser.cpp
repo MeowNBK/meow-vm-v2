@@ -9,7 +9,7 @@ namespace meow::inline loader {
 using namespace meow::core;
 using namespace meow::runtime;
 using namespace meow::memory;
-using namespace meow::core::objects;
+using namespace meow::objects;
 
 static const std::unordered_map<std::string_view, OpCode> OP_MAP = {{"LOAD_CONST", OpCode::LOAD_CONST},
                                                                     {"LOAD_NULL", OpCode::LOAD_NULL},
@@ -72,9 +72,9 @@ static const std::unordered_map<std::string_view, OpCode> OP_MAP = {{"LOAD_CONST
                                                                     {"GET_EXPORT", OpCode::GET_EXPORT},
                                                                     {"IMPORT_ALL", OpCode::IMPORT_ALL}};
 
-TextParser::TextParser(meow::memory::MemoryManager* h, const std::vector<Token>& t, std::string_view s) noexcept : heap_(h), src_name_(s), toks_(t), ti_(0) {
+TextParser::TextParser(meow::MemoryManager* h, const std::vector<Token>& t, std::string_view s) noexcept : heap_(h), src_name_(s), toks_(t), ti_(0) {
 }
-TextParser::TextParser(meow::memory::MemoryManager* h, std::vector<Token>&& t, std::string_view s) noexcept : heap_(h), src_name_(s), toks_(std::move(t)), ti_(0) {
+TextParser::TextParser(meow::MemoryManager* h, std::vector<Token>&& t, std::string_view s) noexcept : heap_(h), src_name_(s), toks_(std::move(t)), ti_(0) {
 }
 
 const Token& TextParser::cur_tok() const {
@@ -159,11 +159,11 @@ std::string TextParser::unescape(std::string_view s) {
 proto_t TextParser::parse_source() {
     if (toks_.empty()) toks_.push_back({"", TokenType::END_OF_FILE, 1, 1});
     auto r = parse();
-    // if(!r.ok) return Result<meow::core::proto_t>::Err(r.diag);
+    // if(!r.ok) return Result<meow::proto_t>::Err(r.diag);
     if (!r.ok) throw std::runtime_error("???");
     for (auto& p : map_) {
         auto rr = resolve_labels(p.second);
-        // if(!rr.ok) return Result<meow::core::proto_t>::Err(rr.diag);
+        // if(!rr.ok) return Result<meow::proto_t>::Err(rr.diag);
         throw std::runtime_error("???");
     }
     // build final protos using build_proto
@@ -173,7 +173,7 @@ proto_t TextParser::parse_source() {
             final_protos_[kv.first] = pr;
         } catch (const std::exception& ex) {
             // return
-            // Result<meow::core::proto_t>::Err(mkdiag(ErrCode::INTERNAL_ERROR,std::string("build_proto
+            // Result<meow::proto_t>::Err(mkdiag(ErrCode::INTERNAL_ERROR,std::string("build_proto
             // error: ")+ex.what(),nullptr));
 
             throw std::runtime_error("???");
@@ -196,20 +196,20 @@ proto_t TextParser::parse_source() {
     }
     auto it = final_protos_.find("main");
     if (it == final_protos_.end()) {
-        // return Result<meow::core::proto_t>::Err(mkdiag(ErrCode::MISSING_DIRECTIVE,"Không tìm thấy
+        // return Result<meow::proto_t>::Err(mkdiag(ErrCode::MISSING_DIRECTIVE,"Không tìm thấy
         // hàm chính '@main'.",nullptr));
         throw std::runtime_error("???");
     }
-    meow::core::proto_t mainp = it->second;
+    meow::proto_t mainp = it->second;
     heap_ = nullptr;
     toks_.clear();
     map_.clear();
-    // return Result<meow::core::proto_t>::Ok(mainp);
+    // return Result<meow::proto_t>::Ok(mainp);
     return mainp;
     // throw std::runtime_error("???");
 }
 
-const std::unordered_map<std::string, meow::core::proto_t>& TextParser::get_finalized_protos() const {
+const std::unordered_map<std::string, meow::proto_t>& TextParser::get_finalized_protos() const {
     return final_protos_;
 }
 
@@ -747,46 +747,46 @@ Result<void> TextParser::instr() {
 }
 
 /* ---------- constants + pool building ---------- */
-Result<meow::core::value_t> TextParser::parse_const_val() {
+Result<meow::value_t> TextParser::parse_const_val() {
     const Token& tk = cur_tok();
     if (tk.type == TokenType::STRING) {
         adv();
         if (tk.lexeme.size() < 2 || tk.lexeme.front() != '"' || tk.lexeme.back() != '"')
-            return Result<meow::core::value_t>::Err(mkdiag(ErrCode::INVALID_IDENT, "Chuỗi literal không hợp lệ (thiếu dấu \").", &tk));
+            return Result<meow::value_t>::Err(mkdiag(ErrCode::INVALID_IDENT, "Chuỗi literal không hợp lệ (thiếu dấu \").", &tk));
         auto inner = tk.lexeme.substr(1, tk.lexeme.size() - 2);
-        return Result<meow::core::value_t>::Ok(Value(heap_->new_string(unescape(inner))));
+        return Result<meow::value_t>::Ok(Value(heap_->new_string(unescape(inner))));
     }
     if (tk.type == TokenType::NUMBER_INT) {
         adv();
         int64_t v;
         auto r = std::from_chars(tk.lexeme.data(), tk.lexeme.data() + tk.lexeme.size(), v);
-        if (r.ec != std::errc() || r.ptr != tk.lexeme.data() + tk.lexeme.size()) return Result<meow::core::value_t>::Err(mkdiag(ErrCode::INVALID_NUMBER, "Số nguyên literal không hợp lệ.", &tk));
-        return Result<meow::core::value_t>::Ok(Value(v));
+        if (r.ec != std::errc() || r.ptr != tk.lexeme.data() + tk.lexeme.size()) return Result<meow::value_t>::Err(mkdiag(ErrCode::INVALID_NUMBER, "Số nguyên literal không hợp lệ.", &tk));
+        return Result<meow::value_t>::Ok(Value(v));
     }
     if (tk.type == TokenType::NUMBER_FLOAT) {
         adv();
         try {
             size_t p = 0;
             double d = std::stod(std::string(tk.lexeme), &p);
-            if (p != tk.lexeme.size()) return Result<meow::core::value_t>::Err(mkdiag(ErrCode::INVALID_NUMBER, "Số thực literal không hợp lệ.", &tk));
-            return Result<meow::core::value_t>::Ok(Value(d));
+            if (p != tk.lexeme.size()) return Result<meow::value_t>::Err(mkdiag(ErrCode::INVALID_NUMBER, "Số thực literal không hợp lệ.", &tk));
+            return Result<meow::value_t>::Ok(Value(d));
         } catch (...) {
-            return Result<meow::core::value_t>::Err(mkdiag(ErrCode::INVALID_NUMBER, "Số thực literal không hợp lệ.", &tk));
+            return Result<meow::value_t>::Err(mkdiag(ErrCode::INVALID_NUMBER, "Số thực literal không hợp lệ.", &tk));
         }
     }
     if (tk.type == TokenType::IDENTIFIER) {
         adv();
-        if (tk.lexeme == "true") return Result<meow::core::value_t>::Ok(Value(true));
-        if (tk.lexeme == "false") return Result<meow::core::value_t>::Ok(Value(false));
-        if (tk.lexeme == "null") return Result<meow::core::value_t>::Ok(Value(null_t{}));
+        if (tk.lexeme == "true") return Result<meow::value_t>::Ok(Value(true));
+        if (tk.lexeme == "false") return Result<meow::value_t>::Ok(Value(false));
+        if (tk.lexeme == "null") return Result<meow::value_t>::Ok(Value(null_t{}));
         if (!tk.lexeme.empty() && tk.lexeme.front() == '@') {
             auto nm = tk.lexeme.substr(1);
-            if (nm.empty()) return Result<meow::core::value_t>::Err(mkdiag(ErrCode::INVALID_IDENT, "Tên proto tham chiếu không được rỗng (chỉ có '@').", &tk));
-            return Result<meow::core::value_t>::Ok(Value(heap_->new_string(std::string("::proto_ref::") + std::string(nm))));
+            if (nm.empty()) return Result<meow::value_t>::Err(mkdiag(ErrCode::INVALID_IDENT, "Tên proto tham chiếu không được rỗng (chỉ có '@').", &tk));
+            return Result<meow::value_t>::Ok(Value(heap_->new_string(std::string("::proto_ref::") + std::string(nm))));
         }
-        return Result<meow::core::value_t>::Err(mkdiag(ErrCode::INVALID_IDENT, "Identifier không hợp lệ cho giá trị hằng số.", &tk));
+        return Result<meow::value_t>::Err(mkdiag(ErrCode::INVALID_IDENT, "Identifier không hợp lệ cho giá trị hằng số.", &tk));
     }
-    return Result<meow::core::value_t>::Err(mkdiag(ErrCode::UNEXPECTED_TOKEN, "Token không mong đợi cho giá trị hằng số.", &tk));
+    return Result<meow::value_t>::Err(mkdiag(ErrCode::UNEXPECTED_TOKEN, "Token không mong đợi cho giá trị hằng số.", &tk));
 }
 
 Result<void> TextParser::resolve_labels(PData& d) {
@@ -803,9 +803,9 @@ Result<void> TextParser::resolve_labels(PData& d) {
     return Result<void>::Ok();
 }
 
-std::vector<meow::core::value_t> TextParser::build_final_const_pool(PData& d) {
+std::vector<meow::value_t> TextParser::build_final_const_pool(PData& d) {
     const std::string pref = "::proto_ref::";
-    std::vector<meow::core::value_t> out;
+    std::vector<meow::value_t> out;
     out.reserve(d.tmp_consts.size());
     for (auto& c : d.tmp_consts) {
         if (c.is_string()) {
@@ -822,7 +822,7 @@ std::vector<meow::core::value_t> TextParser::build_final_const_pool(PData& d) {
 }
 
 /* build_proto: single responsibility */
-meow::core::proto_t TextParser::build_proto(const std::string& name, PData& d) {
+meow::proto_t TextParser::build_proto(const std::string& name, PData& d) {
     string_t nm = heap_->new_string(name);
     auto final_consts = build_final_const_pool(d);
     Chunk ck(std::move(d.code), std::move(final_consts));

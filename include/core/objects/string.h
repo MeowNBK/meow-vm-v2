@@ -13,10 +13,10 @@
 #include "core/meow_object.h"
 
 namespace meow::inline core::inline objects {
-class ObjString : public meow::core::ObjBase<ObjectType::STRING> {
+class ObjString : public meow::ObjBase<ObjectType::STRING> {
 private:
     using storage_t = std::string;
-    using visitor_t = meow::memory::GCVisitor;
+    using visitor_t = meow::GCVisitor;
     storage_t data_;
 public:
     // --- Constructors & destructor ---
@@ -88,4 +88,4 @@ public:
 
     inline void trace(visitor_t&) const noexcept override {}
 };
-}  // namespace meow::core::objects
+}  // namespace meow::objects

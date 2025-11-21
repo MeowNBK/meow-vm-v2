@@ -10,7 +10,7 @@ namespace meow::inline runtime {
 class Chunk {
    public:
     Chunk() = default;
-    Chunk(std::vector<uint8_t>&& code, std::vector<meow::core::Value>&& constants) noexcept : code_(std::move(code)), constant_pool_(std::move(constants)) {
+    Chunk(std::vector<uint8_t>&& code, std::vector<meow::Value>&& constants) noexcept : code_(std::move(code)), constant_pool_(std::move(constants)) {
     }
 
     // --- Modifiers ---
@@ -62,14 +62,14 @@ class Chunk {
     [[nodiscard]] inline bool is_pool_empty() const noexcept {
         return constant_pool_.empty();
     }
-    [[nodiscard]] inline size_t add_constant(meow::core::param_t value) {
+    [[nodiscard]] inline size_t add_constant(meow::param_t value) {
         constant_pool_.push_back(value);
         return constant_pool_.size() - 1;
     }
-    [[nodiscard]] inline meow::core::return_t get_constant(size_t index) const noexcept {
+    [[nodiscard]] inline meow::return_t get_constant(size_t index) const noexcept {
         return constant_pool_[index];
     }
-    [[nodiscard]] inline meow::core::value_t& get_constant_ref(size_t index) noexcept {
+    [[nodiscard]] inline meow::value_t& get_constant_ref(size_t index) noexcept {
         return constant_pool_[index];
     }
     [[nodiscard]] inline const uint8_t* get_code_buffer_ptr() const noexcept {
@@ -87,6 +87,6 @@ class Chunk {
 
    private:
     std::vector<uint8_t> code_;
-    std::vector<meow::core::Value> constant_pool_;
+    std::vector<meow::Value> constant_pool_;
 };
 }  // namespace meow::runtime

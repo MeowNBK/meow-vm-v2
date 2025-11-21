@@ -19,14 +19,14 @@
 namespace meow::inline vm { class MeowEngine; }
 
 namespace meow::inline core::inline objects {
-class ObjNativeFunction : public meow::core::ObjBase<ObjectType::NATIVE_FN> {
+class ObjNativeFunction : public meow::ObjBase<ObjectType::NATIVE_FN> {
    private:
     using engine_t = meow::vm::MeowEngine;
-    using visitor_t = meow::memory::GCVisitor;
+    using visitor_t = meow::GCVisitor;
 
    public:
-    using native_fn_simple = std::function<meow::core::return_t(meow::core::arguments_t)>;
-    using native_fn_double = std::function<meow::core::return_t(engine_t*, meow::core::arguments_t)>;
+    using native_fn_simple = std::function<meow::return_t(meow::arguments_t)>;
+    using native_fn_double = std::function<meow::return_t(engine_t*, meow::arguments_t)>;
 
    private:
     std::variant<native_fn_simple, native_fn_double> function_;
@@ -37,22 +37,22 @@ class ObjNativeFunction : public meow::core::ObjBase<ObjectType::NATIVE_FN> {
     explicit ObjNativeFunction(native_fn_double f) : function_(f) {
     }
 
-    [[nodiscard]] inline meow::core::return_t call(meow::core::arguments_t args) {
+    [[nodiscard]] inline meow::return_t call(meow::arguments_t args) {
         if (auto p = std::get_if<native_fn_simple>(&function_)) {
             return (*p)(args);
         }
-        return meow::core::value_t();
+        return meow::value_t();
     }
-    [[nodiscard]] inline meow::core::return_t call(engine_t* engine, meow::core::arguments_t args) {
+    [[nodiscard]] inline meow::return_t call(engine_t* engine, meow::arguments_t args) {
         if (auto p = std::get_if<native_fn_double>(&function_)) {
             return (*p)(engine, args);
         } else if (auto p = std::get_if<native_fn_simple>(&function_)) {
             return (*p)(args);
         }
-        return meow::core::value_t();
+        return meow::value_t();
     }
 
     void trace(visitor_t&) const noexcept override {
     }
 };
-}  // namespace meow::core::objects
+}  // namespace meow::objects

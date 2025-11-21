@@ -57,8 +57,8 @@ struct Result<void> {
 
 class TextParser {
    public:
-    explicit TextParser(meow::memory::MemoryManager* heap, const std::vector<Token>& t, std::string_view s) noexcept;
-    explicit TextParser(meow::memory::MemoryManager* heap, std::vector<Token>&& t, std::string_view s) noexcept;
+    explicit TextParser(meow::MemoryManager* heap, const std::vector<Token>& t, std::string_view s) noexcept;
+    explicit TextParser(meow::MemoryManager* heap, std::vector<Token>&& t, std::string_view s) noexcept;
     TextParser(const TextParser&) = delete;
     TextParser(TextParser&&) = default;
     TextParser& operator=(const TextParser&) = delete;
@@ -66,11 +66,11 @@ class TextParser {
     ~TextParser() noexcept = default;
 
     // new: returns Result<proto_t> with Diagnostic on error
-    meow::core::proto_t parse_source();
-    [[nodiscard]] const std::unordered_map<std::string, meow::core::proto_t>& get_finalized_protos() const;
+    meow::proto_t parse_source();
+    [[nodiscard]] const std::unordered_map<std::string, meow::proto_t>& get_finalized_protos() const;
 
    private:
-    meow::memory::MemoryManager* heap_{nullptr};
+    meow::MemoryManager* heap_{nullptr};
     std::string src_name_;
     std::vector<Token> toks_;
     size_t ti_{0};
@@ -80,15 +80,15 @@ class TextParser {
         size_t nreg = 0;
         size_t nup = 0;
         std::vector<uint8_t> code;
-        std::vector<meow::core::value_t> tmp_consts;
-        std::vector<meow::core::objects::UpvalueDesc> updesc;
+        std::vector<meow::value_t> tmp_consts;
+        std::vector<meow::objects::UpvalueDesc> updesc;
         std::unordered_map<std::string_view, size_t> labels;
         std::vector<std::tuple<size_t, size_t, std::string_view>> pending;
         bool regs_defined = false;
         bool up_defined = false;
         size_t dir_line = 0;
         size_t dir_col = 0;
-        size_t add_const(meow::core::param_t v) {
+        size_t add_const(meow::param_t v) {
             size_t i = tmp_consts.size();
             tmp_consts.push_back(v);
             return i;
@@ -116,7 +116,7 @@ class TextParser {
 
     PData* cur_{nullptr};
     std::unordered_map<std::string, PData> map_;
-    std::unordered_map<std::string, meow::core::proto_t> final_protos_;
+    std::unordered_map<std::string, meow::proto_t> final_protos_;
 
     // parsing API now returns Result<>
     Result<void> parse();
@@ -128,7 +128,7 @@ class TextParser {
     Result<void> dir_upvalue();
     Result<void> label_def();
     Result<void> instr();
-    Result<meow::core::value_t> parse_const_val();
+    Result<meow::value_t> parse_const_val();
 
     [[nodiscard]] const Token& cur_tok() const;
     [[nodiscard]] const Token& peek_tok(size_t off = 1) const;
@@ -142,8 +142,8 @@ class TextParser {
 
     // label/linking/building helpers
     Result<void> resolve_labels(PData& d);
-    std::vector<meow::core::value_t> build_final_const_pool(PData& d);
-    meow::core::proto_t build_proto(const std::string& name, PData& d);
+    std::vector<meow::value_t> build_final_const_pool(PData& d);
+    meow::proto_t build_proto(const std::string& name, PData& d);
 
     // error helper
     Diagnostic mkdiag(ErrCode code, std::string msg, const Token* tk = nullptr) const;

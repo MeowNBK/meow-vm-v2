@@ -8,19 +8,18 @@
 
 namespace meow::inline common {
 
-inline int64_t to_int(meow::core::param_t value) noexcept {
-    using namespace meow::core;
+inline int64_t to_int(meow::param_t value) noexcept {
     using i64_limits = std::numeric_limits<int64_t>;
     return value.visit(
-        [](null_t) -> int64_t { return 0; },
-        [](int_t i) -> int64_t { return i; },
-        [](float_t r) -> int64_t {
+        [](meow::null_t) -> int64_t { return 0; },
+        [](meow::int_t i) -> int64_t { return i; },
+        [](meow::float_t r) -> int64_t {
             if (std::isinf(r)) return (r > 0) ? i64_limits::max() : i64_limits::min();
             if (std::isnan(r)) return 0;
             return static_cast<int64_t>(r);
         },
-        [](bool_t b) -> int64_t { return b ? 1 : 0; },
-        [](string_t s) -> int64_t {
+        [](meow::bool_t b) -> int64_t { return b ? 1 : 0; },
+        [](meow::string_t s) -> int64_t {
             std::string_view sv = s->c_str();
 
             size_t left = 0;
@@ -89,14 +88,13 @@ inline int64_t to_int(meow::core::param_t value) noexcept {
     );
 }
 
-inline double to_float(meow::core::param_t value) noexcept {
-    using namespace meow::core;
+inline double to_float(meow::param_t value) noexcept {
     return value.visit(
-        [](null_t) -> double { return 0.0; },
-        [](int_t i) -> double { return static_cast<double>(i); },
-        [](float_t f) -> double { return f; },
-        [](bool_t b) -> double { return b ? 1.0 : 0.0; },
-        [](string_t s) -> double {
+        [](meow::null_t) -> double { return 0.0; },
+        [](meow::int_t i) -> double { return static_cast<double>(i); },
+        [](meow::float_t f) -> double { return f; },
+        [](meow::bool_t b) -> double { return b ? 1.0 : 0.0; },
+        [](meow::string_t s) -> double {
             std::string str = s->c_str();
             for (auto& c : str) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
 
@@ -118,88 +116,84 @@ inline double to_float(meow::core::param_t value) noexcept {
     );
 }
 
-inline bool to_bool(meow::core::param_t value) noexcept {
-    using namespace meow::core;
+inline bool to_bool(meow::param_t value) noexcept {
     return value.visit(
-        [](null_t) -> bool { return false; },
-        [](int_t i) -> bool { return i != 0; },
-        [](float_t f) -> bool { return f != 0.0 && !std::isnan(f); },
-        [](bool_t b) -> bool { return b; },
-        [](string_t s) -> bool { return !s->empty(); },
-        [](array_t a) -> bool { return !a->empty(); },
-        [](hash_table_t o) -> bool { return !o->empty(); },
+        [](meow::null_t) -> bool { return false; },
+        [](meow::int_t i) -> bool { return i != 0; },
+        [](meow::float_t f) -> bool { return f != 0.0 && !std::isnan(f); },
+        [](meow::bool_t b) -> bool { return b; },
+        [](meow::string_t s) -> bool { return !s->empty(); },
+        [](meow::array_t a) -> bool { return !a->empty(); },
+        [](meow::hash_table_t o) -> bool { return !o->empty(); },
         [](auto&&) -> bool { return true; }
     );
 }
 
-inline std::string to_string(meow::core::param_t value) noexcept;
+inline std::string to_string(meow::param_t value) noexcept;
 
 namespace detail {
-inline std::string object_to_string(meow::core::object_t obj) noexcept {
+inline std::string object_to_string(meow::object_t obj) noexcept {
     if (obj == nullptr) {
         return "<null_object_ptr>";
     }
     
-    using namespace meow::core;
-    using namespace meow::core::objects;
-
     switch (obj->get_type()) {
-        case ObjectType::STRING:
-            return "\"" + std::string(reinterpret_cast<string_t>(obj)->c_str()) + "\"";
+        case meow::ObjectType::STRING:
+            return "\"" + std::string(reinterpret_cast<meow::string_t>(obj)->c_str()) + "\"";
 
-        case ObjectType::ARRAY: {
-            array_t arr = reinterpret_cast<array_t>(obj);
+        case meow::ObjectType::ARRAY: {
+            array_t arr = reinterpret_cast<meow::array_t>(obj);
             std::string out = "[";
             for (size_t i = 0; i < arr->size(); ++i) {
                 if (i > 0) out += ", ";
-                out += meow::common::to_string(arr->get(i)); 
+                out += meow::to_string(arr->get(i)); 
             }
             out += "]";
             return out;
         }
 
-        case ObjectType::HASH_TABLE: {
-            hash_table_t hash = reinterpret_cast<hash_table_t>(obj);
+        case meow::ObjectType::HASH_TABLE: {
+            hash_table_t hash = reinterpret_cast<meow::hash_table_t>(obj);
             std::string out = "{";
             bool first = true;
             for (auto it = hash->begin(); it != hash->end(); ++it) {
                 if (!first) out += ", ";
                 out += "\"" + std::string(it->first->c_str()) + "\": ";
-                out += meow::common::to_string(it->second);
+                out += meow::to_string(it->second);
                 first = false;
             }
             out += "}";
             return out;
         }
 
-        case ObjectType::CLASS: {
-            auto name = reinterpret_cast<class_t>(obj)->get_name();
+        case meow::ObjectType::CLASS: {
+            auto name = reinterpret_cast<meow::class_t>(obj)->get_name();
             return "<class '" + (name ? std::string(name->c_str()) : "??") + "'>";
         }
 
-        case ObjectType::INSTANCE: {
-            auto name = reinterpret_cast<instance_t>(obj)->get_class()->get_name();
+        case meow::ObjectType::INSTANCE: {
+            auto name = reinterpret_cast<meow::instance_t>(obj)->get_class()->get_name();
             return "<" + (name ? std::string(name->c_str()) : "??") + " instance>";
         }
 
-        case ObjectType::BOUND_METHOD:
+        case meow::ObjectType::BOUND_METHOD:
             return "<bound_method>";
 
-        case ObjectType::MODULE: {
-            auto name = reinterpret_cast<module_t>(obj)->get_file_name();
+        case meow::ObjectType::MODULE: {
+            auto name = reinterpret_cast<meow::module_t>(obj)->get_file_name();
             return "<module '" + (name ? std::string(name->c_str()) : "??") + "'>";
         }
 
-        case ObjectType::NATIVE_FN:
+        case meow::ObjectType::NATIVE_FN:
             return "<native_fn>";
 
-        case ObjectType::FUNCTION: {
-            auto name = reinterpret_cast<function_t>(obj)->get_proto()->get_name();
+        case meow::ObjectType::FUNCTION: {
+            auto name = reinterpret_cast<meow::function_t>(obj)->get_proto()->get_name();
             return "<function '" + (name ? std::string(name->c_str()) : "??") + "'>";
         }
 
-        case ObjectType::PROTO: {
-            auto proto = reinterpret_cast<proto_t>(obj);
+        case meow::ObjectType::PROTO: {
+            auto proto = reinterpret_cast<meow::proto_t>(obj);
             auto name = proto->get_name();
             std::ostringstream os;
             os << "<proto '" << (name ? std::string(name->c_str()) : "??") << "'>\n";
@@ -211,7 +205,7 @@ inline std::string object_to_string(meow::core::object_t obj) noexcept {
             return os.str();
         }
 
-        case ObjectType::UPVALUE:
+        case meow::ObjectType::UPVALUE:
             return "<upvalue>";
 
         default:
@@ -220,12 +214,11 @@ inline std::string object_to_string(meow::core::object_t obj) noexcept {
 }
 } // namespace detail
 
-inline std::string to_string(meow::core::param_t value) noexcept {
-    using namespace meow::core;
+inline std::string to_string(meow::param_t value) noexcept {
     return value.visit(
-        [](null_t) -> std::string { return "null"; },
-        [](int_t val) -> std::string { return std::to_string(val); },
-        [](float_t val) -> std::string {
+        [](meow::null_t) -> std::string { return "null"; },
+        [](meow::int_t val) -> std::string { return std::to_string(val); },
+        [](meow::float_t val) -> std::string {
             if (std::isnan(val)) return "NaN";
             if (std::isinf(val)) return (val > 0) ? "Infinity" : "-Infinity";
 
@@ -246,8 +239,8 @@ inline std::string to_string(meow::core::param_t value) noexcept {
             }
             return str;
         },
-        [](bool_t val) -> std::string { return val ? "true" : "false"; },
-        [](object_t obj) -> std::string {
+        [](meow::bool_t val) -> std::string { return val ? "true" : "false"; },
+        [](meow::object_t obj) -> std::string {
             return detail::object_to_string(obj);
         }
     );
