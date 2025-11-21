@@ -4,7 +4,7 @@ project(meow-vm LANGUAGES CXX)
 option(ENABLE_UNITY_BUILD "Enable Unity/ Jumbo build to reduce compiler overhead" ON)
 option(MEOW_STD_SHARED "Build stdlib as a shared library instead of linking object library into executable" OFF)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
