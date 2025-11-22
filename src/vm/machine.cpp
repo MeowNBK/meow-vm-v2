@@ -7,6 +7,8 @@
 #include "runtime/builtin_registry.h"
 #include "runtime/execution_context.h"
 #include "runtime/operator_dispatcher.h"
+#include "runtime/upvalue.h"
+#include "vm/macros.h"
 #include "common/cast.h"
 #include "debug/print.h"
 
@@ -16,7 +18,6 @@
 #include "core/objects/module.h"
 #include "core/objects/oop.h"
 
-// === Di chuyển các using namespace lên trên ===
 using namespace meow::vm;
 using namespace meow::core;
 using namespace meow::runtime;
@@ -24,237 +25,12 @@ using namespace meow::memory;
 using namespace meow::debug;
 using namespace meow::common;
 
-// === Di chuyển các Macro lên trên ===
-
-// --- Macro đọc bytecode ---
-#define READ_BYTE() (*ip++)
-#define READ_U16() (ip += 2, (uint16_t)((ip[-2] | (ip[-1] << 8))))
-#define READ_U64()                                                                                                                                                                 \
-    (ip += 8, (uint64_t)(ip[-8]) | ((uint64_t)(ip[-7]) << 8) | ((uint64_t)(ip[-6]) << 16) | ((uint64_t)(ip[-5]) << 24) | ((uint64_t)(ip[-4]) << 32) | ((uint64_t)(ip[-3]) << 40) | \
-                  ((uint64_t)(ip[-2]) << 48) | ((uint64_t)(ip[-1]) << 56))
-
-#define READ_I64() (std::bit_cast<int64_t>(READ_U64()))
-#define READ_F64() (std::bit_cast<double>(READ_U64()))
-#define READ_ADDRESS() READ_U16()
-
-#define CURRENT_CHUNK() (context_->current_frame_->function_->get_proto()->get_chunk())
-#define READ_CONSTANT() (CURRENT_CHUNK().get_constant(READ_U16()))
-
-#define REGISTER(idx) (context_->registers_[context_->current_base_ + (idx)])
-#define CONSTANT(idx) (CURRENT_CHUNK().get_constant(idx))
-
-#define UNARY_OP_HANDLER(OPCODE, OPNAME) \
-    op_##OPCODE: { \
-        uint16_t dst = READ_U16(); \
-        uint16_t src = READ_U16(); \
-        auto& val = REGISTER(src); \
-        if (auto func = op_dispatcher_->find(OpCode::OPCODE, val)) { \
-            REGISTER(dst) = func(val); \
-        } else { \
-            throw_vm_error("Unsupported unary operator " OPNAME); \
-        } \
-        DISPATCH(); \
-    }
-
-#define BINARY_OP_HANDLER(OPCODE, OPNAME) \
-    op_##OPCODE: { \
-        uint16_t dst = READ_U16(); \
-        uint16_t r1 = READ_U16(); \
-        uint16_t r2 = READ_U16(); \
-        auto& left = REGISTER(r1); \
-        auto& right = REGISTER(r2); \
-        if (auto func = op_dispatcher_->find(OpCode::OPCODE, left, right)) { \
-            REGISTER(dst) = func(left, right); \
-        } else { \
-            throw_vm_error("Unsupported binary operator " OPNAME); \
-        } \
-        DISPATCH(); \
-    }
-
-#define DISPATCH()                                                \
-    do {                                                          \
-        context_->current_frame_->ip_ = ip;                       \
-        uint8_t instruction = READ_BYTE();                        \
-        [[assume(instruction < static_cast<size_t>(OpCode::TOTAL_OPCODES))]]; \
-        goto *dispatch_table[instruction];                        \
-    } while (0)
-
-inline bool is_truthy(param_t value) noexcept {
-    if (value.is_null()) return false;
-    if (value.is_bool()) return value.as_bool();
-    if (value.is_int()) return value.as_int() != 0;
-    if (value.is_float()) {
-        double r = value.as_float();
-        return r != 0.0 && !std::isnan(r);
-    }
-    if (value.is_string()) return !value.as_string()->empty();
-    if (value.is_array()) return !value.as_array()->empty();
-    if (value.is_hash_table()) return !value.as_hash_table()->empty();
-    return true;
-}
-
-inline upvalue_t capture_upvalue(ExecutionContext* context, MemoryManager* heap, size_t register_index) {
-    // Tìm kiếm các upvalue đã mở từ trên xuống dưới (chỉ số stack cao -> thấp)
-    for (auto it = context->open_upvalues_.rbegin(); it != context->open_upvalues_.rend(); ++it) {
-        upvalue_t uv = *it;
-        if (uv->get_index() == register_index) return uv;
-        if (uv->get_index() < register_index) break;  // Đã đi qua, không cần tìm nữa
-    }
-
-    // Không tìm thấy, tạo mới
-    upvalue_t new_uv = heap->new_upvalue(register_index);
-
-    // Chèn vào danh sách đã sắp xếp (theo chỉ số stack)
-    auto it = std::lower_bound(context->open_upvalues_.begin(), context->open_upvalues_.end(), new_uv, [](auto a, auto b) { return a->get_index() < b->get_index(); });
-    context->open_upvalues_.insert(it, new_uv);
-    return new_uv;
-}
-
-inline void close_upvalues(ExecutionContext* context, size_t last_index) noexcept {
-    // Đóng tất cả upvalue có chỉ số register >= last_index
-    while (!context->open_upvalues_.empty() && context->open_upvalues_.back()->get_index() >= last_index) {
-        upvalue_t uv = context->open_upvalues_.back();
-        uv->close(context->registers_[uv->get_index()]);
-        context->open_upvalues_.pop_back();
-    }
-}
-
-
-// === Include các file handler (Bây giờ đã an toàn) ===
 #include "handlers/load.inl"
 #include "handlers/memory.inl"
 #include "handlers/data.inl"
 #include "handlers/oop.inl"
 #include "handlers/module.inl"
 #include "handlers/exception.inl"
-
-
-// === Bắt đầu phần code logic của meow_vm.cpp ===
-
-Machine::Machine(const std::string& entry_point_directory, const std::string& entry_path, int argc, char* argv[]) {
-    args_.entry_point_directory_ = entry_point_directory;
-    args_.entry_path_ = entry_path;
-    for (int i = 0; i < argc; ++i) {
-        args_.command_line_arguments_.emplace_back(argv[i]);
-    }
-
-    context_ = std::make_unique<ExecutionContext>();
-    builtins_ = std::make_unique<BuiltinRegistry>();
-
-    auto gc = std::make_unique<meow::MarkSweepGC>(context_.get(), builtins_.get());
-
-    heap_ = std::make_unique<meow::MemoryManager>(std::move(gc));
-
-    mod_manager_ = std::make_unique<meow::ModuleManager>(heap_.get(), this);
-    op_dispatcher_ = std::make_unique<OperatorDispatcher>(heap_.get());
-
-    printl("Machine initialized successfully!");
-    std::cout << "[log] Detected size of value is: " << std::to_string(sizeof(value_t)) << "\n";
-}
-
-Machine::~Machine() noexcept {
-    printl("Machine shutting down.");
-}
-
-[[nodiscard]] inline uint8_t to_byte(OpCode op_code) noexcept {
-    return static_cast<uint8_t>(op_code);
-}
-
-using raw_value_t = meow::variant<OpCode, uint64_t, double, int64_t, uint16_t>;
-[[nodiscard]] inline constexpr Chunk make_chunk(const std::vector<raw_value_t>& code) {
-    Chunk chunk;
-
-    for (size_t i = 0; i < code.size(); ++i) {
-        code[i].visit([&chunk](OpCode value) { chunk.write_byte(static_cast<uint8_t>(value)); }, [&chunk](uint64_t value) { chunk.write_u64(value); },
-                      [&chunk](double value) { chunk.write_f64(value); }, [&chunk](int64_t value) { chunk.write_u64(std::bit_cast<uint64_t>(value)); },
-                      [&chunk](uint16_t value) { chunk.write_u16(value); });
-    }
-
-    return chunk;
-}
-
-void Machine::interpret() noexcept {
-    try {
-        prepare();
-        run();
-    } catch (const std::exception& e) {
-        printl("An execption was threw: {}", e.what());
-    }
-}
-
-// void Machine::prepare() noexcept {
-//     printl("Preparing for execution...");
-
-//     using u16 = uint16_t;
-//     using u64 = uint64_t;
-
-//     using enum OpCode;
-
-//     Chunk test_chunk = make_chunk({
-//         LOAD_INT, u16(0), u64(1802),
-//         LOAD_TRUE, u16(1),
-//         NEW_ARRAY, u16(2), u16(0), u16(2), 
-//         HALT
-//     });
-//     size_t num_register = 3;
-
-//     auto main_proto = heap_->new_proto(num_register, 0, heap_->new_string("main"), std::move(test_chunk));
-//     auto main_func = heap_->new_function(main_proto);
-
-//     auto main_module = heap_->new_module(heap_->new_string("main"), heap_->new_string(args_.entry_path_), main_proto);
-
-//     context_->registers_.resize(num_register);
-
-//     context_->call_stack_.emplace_back(main_func, main_module, 0, static_cast<size_t>(-1), main_func->get_proto()->get_chunk().get_code());
-
-//     if (context_->call_stack_.empty()) {
-//         printl("Execution finished: Call stack is empty.");
-//         return;
-//     }
-
-//     context_->current_frame_ = &context_->call_stack_.back();
-//     context_->current_base_ = context_->current_frame_->start_reg_;
-// }
-
-void Machine::prepare() noexcept {
-    std::filesystem::path full_path = std::filesystem::path(args_.entry_point_directory_) / args_.entry_path_;
-    
-    printl("Preparing execution for: {}", full_path.string());
-
-    auto path_str = heap_->new_string(full_path.string());
-    
-    auto importer_str = heap_->new_string(""); 
-
-    try {
-        module_t main_module = mod_manager_->load_module(path_str, importer_str);
-
-        if (!main_module) {
-            throw_vm_error("Could not load entry module.");
-        }
-
-        proto_t main_proto = main_module->get_main_proto();
-        function_t main_func = heap_->new_function(main_proto);
-
-        context_->registers_.resize(main_proto->get_num_registers());
-
-        context_->call_stack_.emplace_back(
-            main_func, 
-            main_module, 
-            0,
-            static_cast<size_t>(-1),
-            main_proto->get_chunk().get_code()
-        );
-
-        context_->current_frame_ = &context_->call_stack_.back();
-        context_->current_base_ = context_->current_frame_->start_reg_;
-        
-        printl("Module loaded successfully. Starting VM loop...");
-
-    } catch (const std::exception& e) {
-        printl("Fatal error during preparation: {}", e.what());
-        exit(1); 
-    }
-}
 
 void Machine::run() {
     printl("Starting Machine execution loop (Computed Goto)...");
@@ -359,13 +135,10 @@ dispatch_start:
             }
             context_->registers_.resize(old_base);
             
-            goto dispatch_start; // Nhảy về đầu dispatch
+            goto dispatch_start;
         }
         
-        // --- Dispatch chính ---
         DISPATCH(); // Nhảy đến opcode đầu tiên
-
-        // --- Các Label thực thi Opcode (chuyển đổi từ 'case') ---
 
         op_LOAD_CONST: {
             op_load_const(ip);
@@ -439,7 +212,6 @@ dispatch_start:
         UNARY_OP_HANDLER(NOT,     "NOT")
         UNARY_OP_HANDLER(BIT_NOT, "BIT_NOT")
         
-        // --- Các Op Handler đã refactor ---
         op_GET_GLOBAL: {
             op_get_global(ip);
             DISPATCH();
@@ -465,7 +237,6 @@ dispatch_start:
             DISPATCH();
         }
 
-        // --- Các Op control flow (Giữ nguyên) ---
         op_JUMP: {
             uint16_t target = READ_ADDRESS();
             ip = CURRENT_CHUNK().get_code() + target;
@@ -508,21 +279,6 @@ dispatch_start:
                 ret_reg = static_cast<size_t>(-1);
             }
             Value& callee = REGISTER(fn_reg);
-
-            // if (callee.is_native_fn()) {
-            //     {
-            //         native_fn_t native = callee.as_native_fn();
-            //         std::vector<Value> args(argc);
-            //         for (size_t i = 0; i < argc; ++i) {
-            //             args[i] = REGISTER(arg_start + i);
-            //         }
-            //         Value result = native->call(this, args);
-            //         if (ret_reg != static_cast<size_t>(-1)) {
-            //             REGISTER(dst) = result;
-            //         }
-            //     }
-            //     DISPATCH();
-            // }
 
             if (callee.is_native_fn()) {
                 native_fn_t fn = callee.as_native_fn();
@@ -618,7 +374,6 @@ dispatch_start:
             DISPATCH();
         }
 
-        // --- Các Op Handler đã refactor ---
         op_NEW_ARRAY: {
             op_new_array(ip);
             DISPATCH();
@@ -672,12 +427,10 @@ dispatch_start:
             DISPATCH();
         }
 
-        // --- Các Op control flow (Giữ nguyên) ---
         op_THROW: {
-            uint16_t reg = READ_U16(); // Sửa warning
-            // Sử dụng thanh ghi để tạo thông báo lỗi
+            uint16_t reg = READ_U16();
             throw_vm_error("Explicit throw: " + to_string(REGISTER(reg)));
-            DISPATCH(); // Sẽ không bao giờ đạt tới
+            DISPATCH();
         }
         op_SETUP_TRY: {
             uint16_t target = READ_ADDRESS();
@@ -720,7 +473,6 @@ dispatch_start:
             DISPATCH();
         }
 
-        // --- Các Op Handler đã refactor ---
         op_EXPORT: {
             op_export(ip);
             DISPATCH();
@@ -734,7 +486,6 @@ dispatch_start:
             DISPATCH();
         }
 
-        // --- Op cuối cùng (Giữ nguyên) ---
         op_HALT: {
             printl("halt");
             if (!context_->registers_.empty()) {
@@ -742,14 +493,14 @@ dispatch_start:
                     printl("Final value in R0: {}", REGISTER(0).as_int());
                 }
             }
-            return; // Thoát hàm run()
+            return;
         }
 
     } catch (const VMError& e) {
         printl("An execption was threw: {}", e.what());
         if (context_->exception_handlers_.empty()) {
             printl("No exception handler. Halting.");
-            return; // Thoát hàm run()
+            return;
         }
 
         ExceptionHandler handler = context_->exception_handlers_.back();
@@ -767,10 +518,8 @@ dispatch_start:
             REGISTER(0) = Value(heap_->new_string(e.what()));
         }
         
-        // --- SỬA LỖI 1: Nhảy về đầu dispatch, KHÔNG dùng DISPATCH() ---
         goto dispatch_start;
     }
 
-    // Không bao giờ đạt tới đây nếu logic đúng
     std::unreachable();
 }
