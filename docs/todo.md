@@ -100,7 +100,6 @@ struct CallFrame {
     meow::core::function_t function_;
     meow::core::module_t module_;
     
-    // [Fix] slots_ (snake_case thành viên)
     meow::core::Value* slots_; 
     
     size_t ret_reg_; 
@@ -169,7 +168,7 @@ MeowVM::MeowVM(...) {
 #define REGISTER(idx) (context_->current_frame_->slots_[idx]) 
 ```
 
-#### b. Logic `prepare()` (Chuẩn snake\_case)
+#### b. Logic `prepare()`
 
 ```cpp
 void MeowVM::prepare() noexcept {
@@ -196,7 +195,7 @@ void MeowVM::prepare() noexcept {
 }
 ```
 
-#### c. `op_CALL` (Chuẩn snake\_case)
+#### c. `op_CALL`
 
 ```cpp
 op_CALL: {
@@ -286,3 +285,181 @@ op_RETURN: {
   * **Sửa:** `include/core/meow_object.h` -\> Xóa `ObjectType::NATIVE_FN`.
   * **Sửa:** `include/core/object_traits.h` -\> Xóa traits `ObjNativeFunction`.
   * **Sửa:** `src/memory/memory_manager.cpp` -\> Xóa `new_native`.
+
+**Mục tiêu:** Hoàn thiện hệ thống báo lỗi cho V2 bằng cách:
+
+1.  Tích hợp module `diagnostics` vào `Machine`.
+2.  Tái hiện khả năng "Stack Trace" (truy vết ngăn xếp) từ Legacy nhưng đẹp hơn.
+3.  Thêm khả năng hiển thị ngữ cảnh (Context) khi lỗi xảy ra.
+
+Dưới đây là mã nguồn để hoàn thiện hệ thống báo lỗi:
+
+### 1\. Cập nhật `VMError` để chứa thông tin cấu trúc
+
+Thay vì chỉ chứa chuỗi, `VMError` cần chứa `Diagnostic` để `main.cpp` có thể render đẹp mắt.
+
+**File:** `include/vm/machine.h` (Sửa lại struct VMError)
+
+```cpp
+#include "diagnostics/diagnostic.h" // Thêm include này
+
+namespace meow::inline vm {
+
+// VMError bây giờ chứa một object Diagnostic đầy đủ
+struct VMError : public std::runtime_error {
+    meow::diagnostics::Diagnostic diag;
+
+    explicit VMError(meow::diagnostics::Diagnostic d) 
+        : std::runtime_error(d.code + ": " + (d.args.count("msg") ? d.args.at("msg") : "")), 
+          diag(std::move(d)) {}
+};
+
+// ... (Phần còn lại của class Machine giữ nguyên)
+```
+
+### 2\. Triển khai logic tạo báo lỗi trong `Machine`
+
+Chúng ta cần viết một hàm helper `create_runtime_error` trong `Machine` để thu thập Call Stack và tạo object `Diagnostic`.
+
+**File:** `src/vm/machine.cpp`
+
+Thêm đoạn code này vào phần implement của `Machine`, hoặc tách ra file riêng nếu muốn gọn. Ở đây mình sẽ cài đè vào logic `throw_vm_error` cũ.
+
+```cpp
+// Helper: Lấy dòng hiện tại (Giả sử Chunk có hỗ trợ debug lines, nếu chưa có thì trả về 0)
+// Bạn cần bổ sung vector lines vào Chunk sau này để có số dòng chính xác.
+size_t get_current_line(const Chunk& chunk, size_t ip_offset) {
+    // TODO: Implement getLine(ip_offset) trong Chunk class
+    return 0; 
+}
+
+// Hàm helper nội bộ để xây dựng Diagnostic từ trạng thái VM hiện tại
+meow::diagnostics::Diagnostic Machine::create_runtime_error(const std::string& message) {
+    using namespace meow::diagnostics;
+
+    Diagnostic d;
+    d.code = "RUNTIME_ERROR";
+    d.severity = Severity::Error;
+    d.args["msg"] = message;
+
+    // 1. Xây dựng Stack Trace (Call Stack)
+    // Duyệt ngược từ frame hiện tại về main
+    for (auto it = context_->call_stack_.rbegin(); it != context_->call_stack_.rend(); ++it) {
+        const CallFrame& frame = *it;
+        
+        CallFrameInfo info; // (Lưu ý: diagnostics::CallFrame đổi tên thành CallFrameInfo để tránh trùng với runtime::CallFrame nếu bị conflict namespace)
+        // Hoặc dùng meow::diagnostics::CallFrame trực tiếp:
+        meow::diagnostics::CallFrame diagFrame;
+        
+        // Lấy tên hàm
+        if (frame.function_ && frame.function_->get_proto()) {
+            auto name = frame.function_->get_proto()->get_name();
+            diagFrame.function = name ? std::string(name->c_str()) : "<anonymous>";
+        } else {
+            diagFrame.function = "<script>";
+        }
+
+        // Lấy file path
+        if (frame.module_) {
+            auto path = frame.module_->get_file_path();
+            diagFrame.file = path ? std::string(path->c_str()) : "";
+        }
+
+        // Tính toán IP offset và dòng
+        if (frame.function_ && frame.function_->get_proto()) {
+            const Chunk& chunk = frame.function_->get_proto()->get_chunk();
+            size_t offset = frame.ip_ - chunk.get_code();
+            // Giảm 1 vì IP trỏ đến lệnh tiếp theo
+            if (offset > 0) offset--; 
+            
+            // diagFrame.line = chunk.getLine(offset); // Cần implement trong Chunk
+            diagFrame.line = 0; // Placeholder
+            diagFrame.col = 0;
+        }
+
+        d.callstack.push_back(diagFrame);
+    }
+
+    // 2. Thêm Snapshot (Tùy chọn: Tương tự Legacy nhưng gọn hơn)
+    // Có thể thêm vào d.notes nếu muốn hiển thị giá trị register hiện tại
+    return d;
+}
+
+// Sửa lại hàm throw_vm_error trong Machine class
+[[noreturn]] void Machine::throw_vm_error(const std::string& message) {
+    auto diag = create_runtime_error(message);
+    throw VMError(std::move(diag));
+}
+```
+
+### 3\. Cập nhật `Machine::run` để bắt lỗi
+
+Sửa lại khối `catch` trong `run()` để hiển thị lỗi đẹp hơn.
+
+**File:** `src/vm/machine.cpp`
+
+```cpp
+void Machine::run() {
+    // ... (phần dispatch loop giữ nguyên)
+
+    } catch (const VMError& e) {
+        // In lỗi ra màn hình sử dụng hệ thống Diagnostics xịn của V2
+        meow::diagnostics::SimpleLocaleSource locale; // Có thể load từ file sau
+        meow::diagnostics::RenderOptions opts;
+        opts.enable_color = true;
+        
+        // Render lỗi ra stderr
+        std::string formatted_error = meow::diagnostics::render_to_human(e.diag, locale, opts);
+        std::cerr << formatted_error << std::endl;
+
+        // Logic Exception Handling (Try/Catch trong ngôn ngữ Meow)
+        if (context_->exception_handlers_.empty()) {
+            // Không có try/catch nào bắt -> Chết chương trình
+            return; 
+        }
+
+        // ... (Phần logic stack unwinding giữ nguyên như cũ) ...
+        // Lưu ý: Bạn cần chuyển message từ e.diag.args["msg"] vào register lỗi
+        if (context_->current_base_ < context_->registers_.size()) {
+             // Lấy message gốc
+            REGISTER(0) = Value(heap_->new_string(e.diag.args["msg"]));
+        }
+        goto dispatch_start;
+    }
+}
+```
+
+### 4\. Bổ sung Debug Lines cho `Chunk` (Khuyên dùng)
+
+Để báo lỗi chính xác "Error at line 10", bạn cần thêm thông tin dòng vào `Chunk`.
+
+**File:** `include/runtime/chunk.h`
+
+```cpp
+class Chunk {
+private:
+    // Run-length encoding cho số dòng để tiết kiệm bộ nhớ
+    // Ví dụ: <line_number, count>
+    std::vector<std::pair<int, int>> lines_; 
+
+public:
+    // ...
+    
+    void add_line(int line) {
+        if (!lines_.empty() && lines_.back().first == line) {
+            lines_.back().second++;
+        } else {
+            lines_.emplace_back(line, 1);
+        }
+    }
+
+    [[nodiscard]] int get_line(size_t offset) const noexcept {
+        size_t current_offset = 0;
+        for (const auto& [line, count] : lines_) {
+            current_offset += count;
+            if (offset < current_offset) return line;
+        }
+        return -1;
+    }
+};
+```
