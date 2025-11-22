@@ -217,9 +217,11 @@ void Machine::interpret() noexcept {
 // }
 
 void Machine::prepare() noexcept {
-    printl("Preparing execution for: {}", args_.entry_path_);
+    std::filesystem::path full_path = std::filesystem::path(args_.entry_point_directory_) / args_.entry_path_;
+    
+    printl("Preparing execution for: {}", full_path.string());
 
-    auto path_str = heap_->new_string(args_.entry_path_);
+    auto path_str = heap_->new_string(full_path.string());
     
     auto importer_str = heap_->new_string(""); 
 

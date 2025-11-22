@@ -31,7 +31,7 @@ namespace meow::inline core {
     using object_t = MeowObject*;
     
     using array_t = meow::ObjArray*;
-    using string_t = const meow::ObjString*;
+    using string_t = meow::ObjString*;
     using hash_table_t = meow::ObjHashTable*;
     using instance_t = meow::ObjInstance*;
     using class_t = meow::ObjClass*;
