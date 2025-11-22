@@ -524,6 +524,19 @@ dispatch_start:
             //     DISPATCH();
             // }
 
+            if (callee.is_native_fn()) {
+                native_fn_t fn = callee.as_native_fn();
+                
+                Value* args_ptr = &REGISTER(arg_start); 
+                
+                Value result = fn(this, argc, args_ptr);
+                
+                if (instruction == OpCode::CALL && ret_reg != static_cast<size_t>(-1)) {
+                    REGISTER(dst) = result;
+                }
+                DISPATCH();
+            }
+
             instance_t self = nullptr;
             function_t closure_to_call = nullptr;
             bool is_constructor_call = false;

@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project(meow-vm LANGUAGES CXX)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 option(ENABLE_UNITY_BUILD "Enable Unity/ Jumbo build to reduce compiler overhead" ON)
 option(MEOW_STD_SHARED "Build stdlib as a shared library instead of linking object library into executable" OFF)
@@ -15,9 +16,8 @@ file(WRITE ${MEOW_ROOT_FILE} "${MEOW_ROOT_CONTENT}\n")
 file(GLOB_RECURSE VM_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 add_executable(${PROJECT_NAME} ${VM_SOURCES})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin"
-)
+add_executable(masm "tools/masm.cpp")
+target_compile_features(masm PRIVATE cxx_std_23)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${PROJECT_SOURCE_DIR}/include"

@@ -250,13 +250,13 @@ struct Prototype {
     uint32_t num_regs = 0;
     uint32_t num_upvalues = 0;
     
-    std::vector<Constant> constants;
-    std::vector<UpvalueInfo> upvalues;
-    std::vector<uint8_t> bytecode;
+    std::vector<Constant> constants = {};
+    std::vector<UpvalueInfo> upvalues = {};
+    std::vector<uint8_t> bytecode = {};
 
-    std::unordered_map<std::string, size_t> labels;
-    std::vector<std::pair<size_t, std::string>> jump_patches;
-    std::vector<std::pair<size_t, std::string>> try_patches;
+    std::unordered_map<std::string, size_t> labels = {};
+    std::vector<std::pair<size_t, std::string>> jump_patches = {};
+    std::vector<std::pair<size_t, std::string>> try_patches = {};
 };
 
 // ============================================================================
@@ -327,7 +327,7 @@ private:
         std::string func_name = name.lexeme;
         if (func_name.starts_with("@")) func_name = func_name.substr(1);
 
-        protos_.push_back(Prototype{func_name});
+        protos_.push_back(Prototype{.name = func_name});
         curr_proto_ = &protos_.back();
         proto_name_map_[func_name] = protos_.size() - 1;
     }
