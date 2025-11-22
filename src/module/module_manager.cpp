@@ -2,7 +2,6 @@
 
 #include "common/pch.h"
 #include "core/objects/module.h"
-#include "core/objects/native.h"
 #include "core/objects/string.h"
 #include "memory/memory_manager.h"
 #include "module/module_utils.h"

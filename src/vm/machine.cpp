@@ -474,7 +474,7 @@ dispatch_start:
         op_JUMP_IF_FALSE: {
             uint16_t reg = READ_U16();
             uint16_t target = READ_ADDRESS();
-            bool is_truthy_val = is_truthy(REGISTER(reg));
+            bool is_truthy_val = meow::to_bool(REGISTER(reg));
             if (!is_truthy_val) {
                 ip = CURRENT_CHUNK().get_code() + target;
             }
@@ -483,7 +483,7 @@ dispatch_start:
         op_JUMP_IF_TRUE: {
             uint16_t reg = READ_U16();
             uint16_t target = READ_ADDRESS();
-            bool is_truthy_val = is_truthy(REGISTER(reg));
+            bool is_truthy_val = meow::to_bool(REGISTER(reg));
             if (is_truthy_val) {
                 ip = CURRENT_CHUNK().get_code() + target;
             }
