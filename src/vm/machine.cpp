@@ -71,13 +71,6 @@ using namespace meow::common;
         DISPATCH(); \
     }
 
-// #define DISPATCH()                                           \
-//     do {                                                          \
-//         context_->current_frame_->ip_ = ip;                       \
-//         uint8_t instruction = READ_BYTE();                        \
-//         goto *dispatch_table[instruction];                         \
-//     } while (0)
-
 #define DISPATCH()                                                \
     do {                                                          \
         context_->current_frame_->ip_ = ip;                       \
@@ -189,41 +182,77 @@ void Machine::interpret() noexcept {
     }
 }
 
+// void Machine::prepare() noexcept {
+//     printl("Preparing for execution...");
+
+//     using u16 = uint16_t;
+//     using u64 = uint64_t;
+
+//     using enum OpCode;
+
+//     Chunk test_chunk = make_chunk({
+//         LOAD_INT, u16(0), u64(1802),
+//         LOAD_TRUE, u16(1),
+//         NEW_ARRAY, u16(2), u16(0), u16(2), 
+//         HALT
+//     });
+//     size_t num_register = 3;
+
+//     auto main_proto = heap_->new_proto(num_register, 0, heap_->new_string("main"), std::move(test_chunk));
+//     auto main_func = heap_->new_function(main_proto);
+
+//     auto main_module = heap_->new_module(heap_->new_string("main"), heap_->new_string(args_.entry_path_), main_proto);
+
+//     context_->registers_.resize(num_register);
+
+//     context_->call_stack_.emplace_back(main_func, main_module, 0, static_cast<size_t>(-1), main_func->get_proto()->get_chunk().get_code());
+
+//     if (context_->call_stack_.empty()) {
+//         printl("Execution finished: Call stack is empty.");
+//         return;
+//     }
+
+//     context_->current_frame_ = &context_->call_stack_.back();
+//     context_->current_base_ = context_->current_frame_->start_reg_;
+// }
+
 void Machine::prepare() noexcept {
-    printl("Preparing for execution...");
+    printl("Preparing execution for: {}", args_.entry_path_);
 
-    using u16 = uint16_t;
-    using u64 = uint64_t;
+    auto path_str = heap_->new_string(args_.entry_path_);
+    
+    auto importer_str = heap_->new_string(""); 
 
-    using enum OpCode;
+    try {
+        module_t main_module = mod_manager_->load_module(path_str, importer_str);
 
-    Chunk test_chunk = make_chunk({
-        LOAD_INT, u16(0), u64(1802),
-        LOAD_TRUE, u16(1),
-        NEW_ARRAY, u16(2), u16(0), u16(2), 
-        HALT
-    });
-    size_t num_register = 3;
+        if (!main_module) {
+            throw_vm_error("Could not load entry module.");
+        }
 
-    auto main_proto = heap_->new_proto(num_register, 0, heap_->new_string("main"), std::move(test_chunk));
-    auto main_func = heap_->new_function(main_proto);
+        proto_t main_proto = main_module->get_main_proto();
+        function_t main_func = heap_->new_function(main_proto);
 
-    auto main_module = heap_->new_module(heap_->new_string("main"), heap_->new_string(args_.entry_path_), main_proto);
+        context_->registers_.resize(main_proto->get_num_registers());
 
-    context_->registers_.resize(num_register);
+        context_->call_stack_.emplace_back(
+            main_func, 
+            main_module, 
+            0,
+            static_cast<size_t>(-1),
+            main_proto->get_chunk().get_code()
+        );
 
-    context_->call_stack_.emplace_back(main_func, main_module, 0, static_cast<size_t>(-1), main_func->get_proto()->get_chunk().get_code());
+        context_->current_frame_ = &context_->call_stack_.back();
+        context_->current_base_ = context_->current_frame_->start_reg_;
+        
+        printl("Module loaded successfully. Starting VM loop...");
 
-    if (context_->call_stack_.empty()) {
-        printl("Execution finished: Call stack is empty.");
-        return;
+    } catch (const std::exception& e) {
+        printl("Fatal error during preparation: {}", e.what());
+        exit(1); 
     }
-
-    context_->current_frame_ = &context_->call_stack_.back();
-    context_->current_base_ = context_->current_frame_->start_reg_;
 }
-
-// --- HÀM RUN() CHÍNH (ĐÃ TÁI CẤU TRÚC) ---
 
 void Machine::run() {
     printl("Starting Machine execution loop (Computed Goto)...");
@@ -372,7 +401,7 @@ dispatch_start:
             
             auto& left  = REGISTER(r1);
             auto& right = REGISTER(r2);
-            if ((__builtin_expect(!!(left.is_int() && right.is_int()), 1))) {
+            if (left.is_int() && right.is_int()) [[likely]] {
                 REGISTER(dst) = value_t(left.as_int() + right.as_int());
             } else if (left.is_float() && right.is_float()) {
                 REGISTER(dst) = value_t(left.as_float() + right.as_float());

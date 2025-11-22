@@ -195,14 +195,14 @@ inline std::string object_to_string(meow::object_t obj) noexcept {
         case meow::ObjectType::PROTO: {
             auto proto = reinterpret_cast<meow::proto_t>(obj);
             auto name = proto->get_name();
-            std::ostringstream os;
-            os << "<proto '" << (name ? std::string(name->c_str()) : "??") << "'>\n";
-            os << "  - registers: " << proto->get_num_registers() << "\n";
-            os << "  - upvalues:  " << proto->get_num_upvalues() << "\n";
-            os << "  - constants: " << proto->get_chunk().get_pool_size() << "\n";
-            
-            os << meow::debug::disassemble_chunk(proto->get_chunk());
-            return os.str();
+
+            return std::format("<proto '{}'>\n  - registers: {}\n  - upvalues:  {}\n  - constants: {}\n{}",
+                (name ? name->c_str() : "??"),
+                proto->get_num_registers(),
+                proto->get_num_upvalues(),
+                proto->get_chunk().get_pool_size(),
+                meow::disassemble_chunk(proto->get_chunk())
+            );
         }
 
         case meow::ObjectType::UPVALUE:

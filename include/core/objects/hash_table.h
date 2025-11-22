@@ -60,7 +60,7 @@ class ObjHashTable : public meow::ObjBase<ObjectType::HASH_TABLE> {
         return fields_.at(key);
     }
     [[nodiscard]] inline bool has(key_t key) const {
-        return fields_.find(key) != fields_.end();
+        return fields_.contains(key);
     }
 
     // --- Capacity ---
@@ -72,19 +72,11 @@ class ObjHashTable : public meow::ObjBase<ObjectType::HASH_TABLE> {
     }
 
     // --- Iterators ---
-    inline iterator begin() noexcept {
-        return fields_.begin();
-    }
-    inline iterator end() noexcept {
-        return fields_.end();
-    }
-    inline const_iterator begin() const noexcept {
-        return fields_.begin();
-    }
-    inline const_iterator end() const noexcept {
-        return fields_.end();
-    }
+    template <typename Self>
+    auto begin(this Self&& self) noexcept { return std::forward<Self>(self).fields_.begin(); }
 
+    template <typename Self>
+    auto end(this Self&& self) noexcept { return std::forward<Self>(self).fields_.end(); }
     void trace(visitor_t& visitor) const noexcept override;
 };
 }  // namespace meow::objects

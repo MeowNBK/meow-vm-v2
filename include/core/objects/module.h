@@ -46,7 +46,7 @@ class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
         globals_[name] = value;
     }
     [[nodiscard]] inline bool has_global(string_t name) {
-        return globals_.find(name) != globals_.end();
+        return globals_.contains(name);
     }
     inline void import_all_global(const module_t other) noexcept {
         for (const auto& [key, value] : other->globals_) {
@@ -62,7 +62,7 @@ class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
         exports_[name] = value;
     }
     [[nodiscard]] inline bool has_export(string_t name) {
-        return exports_.find(name) != exports_.end();
+        return exports_.contains(name);
     }
     inline void import_all_export(const module_t other) noexcept {
         for (const auto& [key, value] : other->exports_) {
