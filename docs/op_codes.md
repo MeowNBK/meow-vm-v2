@@ -172,9 +172,9 @@ Các opcode dưới đây đều thực hiện toán tử nhị phân và có c�
 * **THROW** — Ném ngoại lệ (nội dung: register).
 
   * Tham số: `reg: u16`.
-* **SETUP_TRY** — Đăng ký handler catch: lưu địa chỉ catch (u16 target/offset).
+* **SETUP_TRY** — Đăng ký handler catch: lưu địa chỉ catch (u16 target/offset) và register để lưu biến lỗi.
 
-  * Tham số: `target: u16` (offset trong chunk).
+  * Tham số: `target: u16` (offset mã lệnh trong chunk), `error_reg: u16` (register để VM lưu lại object lỗi khi bắt được, 0xFFFF nếu không cần biến lỗi).
 * **POP_TRY** — Bỏ handler try hiện tại.
 
   * Tham số: *không có*.

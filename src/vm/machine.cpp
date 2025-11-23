@@ -11,6 +11,7 @@
 #include "vm/macros.h"
 #include "common/cast.h"
 #include "debug/print.h"
+#include "runtime/error_recovery.h"
 
 #include "core/objects/array.h"
 #include "core/objects/function.h"
@@ -428,16 +429,11 @@ dispatch_start:
         }
 
         op_THROW: {
-            uint16_t reg = READ_U16();
-            throw_vm_error("Explicit throw: " + to_string(REGISTER(reg)));
+            op_throw(ip);
             DISPATCH();
         }
         op_SETUP_TRY: {
-            uint16_t target = READ_ADDRESS();
-            size_t catch_ip = target;
-            size_t frame_depth = context_->call_stack_.size() - 1;
-            size_t stack_depth = context_->registers_.size();
-            context_->exception_handlers_.emplace_back(catch_ip, frame_depth, stack_depth);
+            op_setup_try(ip);
             DISPATCH();
         }
         op_POP_TRY: {
@@ -495,30 +491,16 @@ dispatch_start:
             }
             return;
         }
-
     } catch (const VMError& e) {
-        printl("An execption was threw: {}", e.what());
-        if (context_->exception_handlers_.empty()) {
-            printl("No exception handler. Halting.");
+        // Gọi hàm xử lý riêng
+        if (meow::recover_from_error(e, context_.get(), heap_.get())) {
+            // Nếu cứu được, cập nhật lại IP cục bộ từ frame và nhảy tiếp
+            ip = context_->current_frame_->ip_;
+            goto dispatch_start;
+        } else {
+            // Nếu không cứu được, thoát
             return;
         }
-
-        ExceptionHandler handler = context_->exception_handlers_.back();
-        context_->exception_handlers_.pop_back();
-
-        while (context_->call_stack_.size() - 1 > handler.frame_depth_) {
-            close_upvalues(context_.get(), context_->call_stack_.back().start_reg_);
-            context_->call_stack_.pop_back();
-        }
-        context_->registers_.resize(handler.stack_depth_);
-        context_->current_frame_ = &context_->call_stack_.back();
-        ip = CURRENT_CHUNK().get_code() + handler.catch_ip_;
-        context_->current_base_ = context_->current_frame_->start_reg_;
-        if (context_->current_base_ < context_->registers_.size()) {
-            REGISTER(0) = Value(heap_->new_string(e.what()));
-        }
-        
-        goto dispatch_start;
     }
 
     std::unreachable();

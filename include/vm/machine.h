@@ -2,6 +2,7 @@
 
 #include "common/pch.h"
 #include "vm/meow_engine.h"
+#include "vm/vm_error.h"
 
 namespace meow::inline runtime {
     struct ExecutionContext;
@@ -12,10 +13,6 @@ namespace meow::inline memory { class MemoryManager; }
 namespace meow::inline module { class ModuleManager; }
 
 namespace meow::inline vm {
-struct VMError : public std::runtime_error {
-    explicit VMError(const std::string& message) : std::runtime_error(message) {}
-};
-
 struct VMArgs {
     std::vector<std::string> command_line_arguments_;
     std::string entry_point_directory_;
@@ -81,6 +78,8 @@ private:
     inline void op_set_method(const uint8_t*& ip);
     inline void op_inherit(const uint8_t*& ip);
     inline void op_get_super(const uint8_t*& ip);
+    inline void op_throw(const uint8_t*& ip);
+    inline void op_setup_try(const uint8_t*& ip);
     inline void op_pop_try();  // Không cần 'ip'
     inline void op_export(const uint8_t*& ip);
     inline void op_get_export(const uint8_t*& ip);
