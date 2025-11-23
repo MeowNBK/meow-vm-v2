@@ -28,7 +28,7 @@ Machine::Machine(const std::string& entry_point_directory, const std::string& en
     op_dispatcher_ = std::make_unique<OperatorDispatcher>(heap_.get());
 
     meow::printl("Machine initialized successfully!");
-    meow::printl("Detected size of value is: ", std::to_string(sizeof(value_t)));
+    meow::printl("Detected size of value is: {} bytes", sizeof(meow::value_t));
 }
 
 Machine::~Machine() noexcept {

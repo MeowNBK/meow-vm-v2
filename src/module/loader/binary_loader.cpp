@@ -26,7 +26,6 @@ enum class ConstantTag : uint8_t {
 BinaryLoader::BinaryLoader(MemoryManager* heap, const std::vector<uint8_t>& data)
     : heap_(heap), data_(data), cursor_(0) {}
 
-
 void BinaryLoader::check_can_read(size_t bytes) {
     if (cursor_ + bytes > data_.size()) {
         throw BinaryLoaderError("Unexpected end of file. File is truncated or corrupt.");
@@ -56,16 +55,6 @@ uint32_t BinaryLoader::read_u32() {
     return val;
 }
 
-// uint64_t BinaryLoader::read_u64() {
-//     check_can_read(8);
-//     uint64_t val = 0;
-//     for (int i = 0; i < 8; ++i) {
-//         val |= (static_cast<uint64_t>(data_[cursor_ + i]) << (i * 8));
-//     }
-//     cursor_ += 8;
-//     return val;
-// }
-
 uint64_t BinaryLoader::read_u64() {
     check_can_read(8);
     uint64_t val;
@@ -86,29 +75,32 @@ double BinaryLoader::read_f64() {
 string_t BinaryLoader::read_string() {
     uint32_t length = read_u32();
     check_can_read(length);
+    // TODO: Validate utf-8 here if needed
     std::string str(reinterpret_cast<const char*>(data_.data() + cursor_), length);
     cursor_ += length;
     return heap_->new_string(str);
 }
 
-Value BinaryLoader::read_constant() {
+Value BinaryLoader::read_constant(size_t current_proto_idx, size_t current_const_idx) {
     ConstantTag tag = static_cast<ConstantTag>(read_u8());
     switch (tag) {
         case ConstantTag::NULL_T:   return Value(null_t{});
         case ConstantTag::INT_T:    return Value(static_cast<int64_t>(read_u64()));
         case ConstantTag::FLOAT_T:  return Value(read_f64());
         case ConstantTag::STRING_T: return Value(read_string());
+        
         case ConstantTag::PROTO_REF_T: {
-            uint32_t proto_index = read_u32();
-            std::string ref_str = "::proto_ref_idx::" + std::to_string(proto_index);
-            return Value(heap_->new_string(ref_str)); 
+            uint32_t target_proto_index = read_u32();
+            patches_.push_back({current_proto_idx, current_const_idx, target_proto_index});
+            
+            return Value(null_t{}); 
         }
         default:
             throw BinaryLoaderError("Unknown constant tag in binary file.");
     }
 }
 
-proto_t BinaryLoader::read_prototype() {
+proto_t BinaryLoader::read_prototype(size_t current_proto_idx) {
     uint32_t num_registers = read_u32();
     uint32_t num_upvalues = read_u32();
     uint32_t name_idx_in_pool = read_u32();
@@ -116,15 +108,17 @@ proto_t BinaryLoader::read_prototype() {
     uint32_t constant_pool_size = read_u32();
     std::vector<Value> constants;
     constants.reserve(constant_pool_size);
+    
     for (uint32_t i = 0; i < constant_pool_size; ++i) {
-        constants.push_back(read_constant());
+        constants.push_back(read_constant(current_proto_idx, i));
     }
     
     if (name_idx_in_pool >= constants.size() || !constants[name_idx_in_pool].is_string()) {
-        throw BinaryLoaderError("Invalid function prototype name index.");
+        throw BinaryLoaderError("Invalid function prototype name index (must be a string).");
     }
     string_t name = constants[name_idx_in_pool].as_string();
 
+    // Upvalues
     uint32_t upvalue_desc_count = read_u32();
     if (upvalue_desc_count != num_upvalues) {
          throw BinaryLoaderError("Upvalue count mismatch.");
@@ -137,6 +131,7 @@ proto_t BinaryLoader::read_prototype() {
         upvalue_descs.emplace_back(is_local, index);
     }
 
+    // Bytecode
     uint32_t bytecode_size = read_u32();
     check_can_read(bytecode_size);
     std::vector<uint8_t> bytecode(data_.data() + cursor_, data_.data() + cursor_ + bytecode_size);
@@ -152,31 +147,35 @@ void BinaryLoader::check_magic() {
     }
     uint32_t version = read_u32();
     if (version != FORMAT_VERSION) {
-        throw BinaryLoaderError(
-            std::format("Bytecode version mismatch. File is v{}, VM supports v{}. Please recompile.", 
-                        version, FORMAT_VERSION)
-        );
+        throw BinaryLoaderError(std::format("Bytecode version mismatch. File is v{}, VM supports v{}.", version, FORMAT_VERSION));
     }
 }
 
 void BinaryLoader::link_prototypes() {    
-    const std::string ref_prefix = "::proto_ref_idx::";
-    for (proto_t proto : loaded_protos_) {
-        Chunk& chunk = const_cast<Chunk&>(proto->get_chunk()); 
-        for (size_t i = 0; i < chunk.get_pool_size(); ++i) {
-            Value& constant_ref = chunk.get_constant_ref(i); 
-            
-            if (constant_ref.is_string()) {
-                std::string_view s = constant_ref.as_string()->c_str();
-                if (s.starts_with(ref_prefix)) {
-                    uint32_t proto_index = std::stoul(std::string(s.substr(ref_prefix.size())));
-                    if (proto_index >= loaded_protos_.size()) {
-                        throw BinaryLoaderError("Invalid prototype reference in constant pool.");
-                    }
-                    constant_ref = Value(loaded_protos_[proto_index]);
-                }
-            }
+    for (const auto& patch : patches_) {
+        if (patch.proto_idx >= loaded_protos_.size()) {
+            throw BinaryLoaderError("Internal Error: Patch parent proto index out of bounds.");
         }
+        if (patch.target_idx >= loaded_protos_.size()) {
+            throw BinaryLoaderError("Invalid prototype reference: Target proto index out of bounds.");
+        }
+
+        proto_t parent_proto = loaded_protos_[patch.proto_idx];
+        proto_t child_proto = loaded_protos_[patch.target_idx];
+
+        // 3. Truy cập Chunk của cha để sửa Constant Pool
+        // Lưu ý: Constant pool trong Chunk không phải const, ta có thể dùng get_constant_ref (cần implement trong Chunk)
+        // hoặc const_cast nếu hàm get trả về const reference (nhưng Chunk nên có hàm set/get_ref).
+        // MeowVM Chunk hiện tại có: get_constant_ref(size_t index) -> value_t&
+        
+        Chunk& chunk = const_cast<Chunk&>(parent_proto->get_chunk()); 
+        
+        if (patch.const_idx >= chunk.get_pool_size()) {
+             throw BinaryLoaderError("Internal Error: Patch constant index out of bounds.");
+        }
+
+        // 4. Vá! Gán đè giá trị null placeholder bằng Proto Object
+        chunk.get_constant_ref(patch.const_idx) = Value(child_proto);
     }
 }
 
@@ -192,7 +191,7 @@ proto_t BinaryLoader::load_module() {
     
     loaded_protos_.reserve(prototype_count);
     for (uint32_t i = 0; i < prototype_count; ++i) {
-        loaded_protos_.push_back(read_prototype());
+        loaded_protos_.push_back(read_prototype(i));
     }
     
     if (main_proto_index >= loaded_protos_.size()) {

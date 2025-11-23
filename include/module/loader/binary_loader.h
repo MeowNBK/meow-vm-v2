@@ -18,13 +18,23 @@ class BinaryLoader {
 public:
     BinaryLoader(meow::MemoryManager* heap, const std::vector<uint8_t>& data);
     meow::proto_t load_module();
+
 private:
+    // --- Patching Structure ---
+    struct Patch {
+        size_t proto_idx;      // Proto đang chứa constant cần vá (Parent)
+        size_t const_idx;      // Vị trí (index) trong Constant Pool cần vá
+        uint32_t target_idx;   // Index của Proto đích (Child) mà nó trỏ tới
+    };
+
     meow::MemoryManager* heap_;
     const std::vector<uint8_t>& data_;
     size_t cursor_ = 0;
 
     std::vector<meow::proto_t> loaded_protos_;
+    std::vector<Patch> patches_;
 
+    // --- Readers ---
     void check_can_read(size_t bytes);
     uint8_t  read_u8();
     uint16_t read_u16();
@@ -33,10 +43,11 @@ private:
     double   read_f64();
     meow::string_t read_string();
     
-    meow::Value read_constant();
-    meow::proto_t read_prototype();
+    meow::Value read_constant(size_t current_proto_idx, size_t current_const_idx);
+    meow::proto_t read_prototype(size_t current_proto_idx);
+    
     void check_magic();
     void link_prototypes();
 };
 
-}
+} // namespace meow::loader

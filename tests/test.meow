@@ -1,13 +1,8 @@
 .func @main
-.registers 3        # Khai báo 3 thanh ghi: R0, R1, R2
-.upvalues 0         # Không có upvalue
-.const 10           # Index 1: Constant INT 10
-.const 20           # Index 2: Constant INT 20
-                    # Lưu ý: Index 0 luôn được Assembler tự động chèn là tên hàm ("main")
-
-# Code
-LOAD_CONST 1 1      # Load const[1] (10) vào R1
-LOAD_CONST 2 2      # Load const[2] (20) vào R2
-ADD 0 1 2           # R0 = R1 + R2
-HALT                # Dừng chương trình (VM sẽ in R0 nếu debug)
+    .registers 3
+    
+    LOAD_INT 0, 1
+    LOAD_INT 1, 2
+    ADD 0, 0, 1
+    HALT
 .endfunc

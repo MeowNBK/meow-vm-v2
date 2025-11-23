@@ -568,9 +568,10 @@ private:
             Constant name_const; 
             name_const.type = ConstType::STRING_T; 
             name_const.val_str = p.name;
-            write_consts.insert(write_consts.begin(), name_const);
 
-            write_u32(0); // Name Index (always 0 now)
+            write_consts.push_back(name_const);
+
+            write_u32(write_consts.size() - 1); // Name Index
             write_u32(write_consts.size()); // Pool Size
 
             for (const auto& c : write_consts) {
