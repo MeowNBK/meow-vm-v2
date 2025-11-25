@@ -40,7 +40,6 @@ namespace detail_backend {
 
 template <typename... Args>
 class variant {
-    // FIX: Sử dụng đúng namespace đã sửa trong variant_utils.h
     using flattened_list_t = utils::flattened_unique_t<Args...>;
     using implementation_t = typename detail_backend::select<flattened_list_t>::type;
 
@@ -73,15 +72,12 @@ public:
     template <typename T> [[nodiscard]] bool holds() const noexcept { return storage_.template holds<T>(); }
     template <typename T> [[nodiscard]] bool is() const noexcept { return holds<T>(); }
 
-    // --- FIX: Expose get (safe_get) cho code cũ ---
     template <typename T> decltype(auto) get() { return storage_.template safe_get<T>(); }
     template <typename T> decltype(auto) get() const { return storage_.template safe_get<T>(); }
 
-    // --- FIX: Expose get_if cho code cũ (value.h gọi cái này) ---
     template <typename T> [[nodiscard]] auto* get_if() noexcept { return storage_.template get_if<T>(); }
     template <typename T> [[nodiscard]] const auto* get_if() const noexcept { return storage_.template get_if<T>(); }
 
-    // Visitation (Deducing This)
     template <typename Self, typename Visitor>
     decltype(auto) visit(this Self&& self, Visitor&& vis) {
         return self.storage_.visit(std::forward<Visitor>(vis));
@@ -92,7 +88,6 @@ public:
         return self.storage_.visit(overload{std::forward<Fs>(fs)...});
     }
 
-    // Monadic Operations (Optional but modern)
     template <typename F>
     auto transform(F&& f) const {
         if (valueless()) return variant<std::monostate>{}; 

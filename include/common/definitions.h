@@ -52,6 +52,7 @@ enum class ValueType : uint8_t {
     Bool,
     Int,
     Float,
+    NativeFn,
     Object,
 
     Array,        // 1  — ARRAY

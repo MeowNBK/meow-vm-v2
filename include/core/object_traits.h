@@ -1,5 +1,3 @@
-// include/core/object_traits.h
-
 #pragma once
 
 #include "core/meow_object.h"
