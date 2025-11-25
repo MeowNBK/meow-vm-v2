@@ -13,6 +13,22 @@ set(MEOW_ROOT_CONTENT "$ORIGIN/..")
 set(MEOW_ROOT_FILE "${CMAKE_BINARY_DIR}/bin/meow-root")
 file(WRITE ${MEOW_ROOT_FILE} "${MEOW_ROOT_CONTENT}\n")
 
+# ==============================================================================
+# [NEW] AUTO-DISCOVERY LIBRARIES
+# Tự động tìm các folder trong libs/ có chứa CMakeLists.txt và add_subdirectory
+# ==============================================================================
+file(GLOB children RELATIVE ${CMAKE_SOURCE_DIR}/libs ${CMAKE_SOURCE_DIR}/libs/*)
+foreach(child ${children})
+    if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/libs/${child} AND EXISTS ${CMAKE_SOURCE_DIR}/libs/${child}/CMakeLists.txt)
+        message(STATUS "📦 Library Found: ${child}")
+        add_subdirectory(libs/${child})
+    endif()
+endforeach()
+
+# ==============================================================================
+# MAIN TARGETS
+# ==============================================================================
+
 file(GLOB_RECURSE VM_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 add_executable(${PROJECT_NAME} ${VM_SOURCES})
 
@@ -21,8 +37,12 @@ target_compile_features(masm PRIVATE cxx_std_23)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${PROJECT_SOURCE_DIR}/include"
-    "${PROJECT_SOURCE_DIR}/libs"
+    # "${PROJECT_SOURCE_DIR}/libs" <-- ĐÃ XÓA: Không cần dòng này nữa
 )
+
+# [NEW] Link thư viện meow::variant vào VM
+# CMake sẽ tự động thêm include path của variant vào VM
+target_link_libraries(${PROJECT_NAME} PRIVATE meow::variant)
 
 # --- Precompiled Headers (PCH) ---
 set(PCH_HEADER "${PROJECT_SOURCE_DIR}/include/common/pch.h")
@@ -50,6 +70,9 @@ if (STD_SOURCES)
     )
 
     target_compile_definitions(meow_std_objects PRIVATE MEOW_STDLIB_EXPORTS)
+    
+    # [NEW] Stdlib cũng cần biết cấu trúc của Variant
+    target_link_libraries(meow_std_objects PRIVATE meow::variant)
 
     if (EXISTS "${PCH_HEADER}")
         target_precompile_headers(meow_std_objects PRIVATE "${PCH_HEADER}")

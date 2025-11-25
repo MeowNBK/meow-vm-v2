@@ -2,7 +2,7 @@
 
 #include "common/pch.h"
 #include "common/definitions.h"
-#include "variant.h"
+#include "meow_variant.h"
 #include "core/meow_object.h"
 #include "core/object_traits.h"
 

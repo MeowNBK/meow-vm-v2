@@ -1,0 +1,22 @@
+==> cmake configure --preset fast-debug
+Preset CMake variables:
+
+  CMAKE_BUILD_TYPE="Debug"
+  CMAKE_CXX_COMPILER="clang++"
+  CMAKE_CXX_COMPILER_LAUNCHER="ccache"
+  CMAKE_CXX_FLAGS_DEBUG="-g -O0 -Wall -Wextra -Wpedantic -Wno-gnu-label-as-value -Wno-c99-designator -fno-omit-frame-pointer"
+  CMAKE_EXPORT_COMPILE_COMMANDS="YES"
+
+-- PCH: Found /home/lazycat/Shared/Projects/cpp_projects/meow-vm-v2/include/common/pch.h -> Enabling precompiled headers.
+-- UNITY_BUILD: Enabled for meow-vm (may greatly speed up builds).
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/lazycat/Shared/Projects/cpp_projects/meow-vm-v2/build/fast-debug
+==> build (ninja -j2)
+[0/2] Re-checking globbed directories...
+[1/3] Building CXX object CMakeFiles/meow-vm.dir/Unity/unity_0_cxx.cxx.o
+[2/3] Building CXX object CMakeFiles/meow-vm.dir/Unity/unity_1_cxx.cxx.o
+[3/3] Linking CXX executable bin/meow-vm
+
+Build finished successfully.
+Executables are located in: build/fast-debug/bin/
