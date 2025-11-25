@@ -6,7 +6,7 @@
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::inline runtime {
+namespace meow {
 struct BuiltinRegistry {
     std::unordered_map<meow::string_t, std::unordered_map<meow::string_t, meow::Value>> methods_;
     std::unordered_map<meow::string_t, std::unordered_map<meow::string_t, meow::Value>> getters_;

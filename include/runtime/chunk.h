@@ -1,12 +1,12 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "core/value.h"
 
-namespace meow::inline loader { class TextParser; }
+namespace meow { class TextParser; }
 
-namespace meow::inline runtime {
+namespace meow {
 class Chunk {
    public:
     Chunk() = default;

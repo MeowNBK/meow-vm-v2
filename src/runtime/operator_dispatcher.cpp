@@ -1,8 +1,8 @@
 #include "runtime/operator_dispatcher.h"
 #include "memory/memory_manager.h"
 
-using namespace meow::runtime;
-using namespace meow::core;
+using namespace meow;
+using namespace meow;
 
 #define BINARY(opcode, type1, type2) \
     binary_dispatch_table_[+OpCode::opcode][+ValueType::type1][+ValueType::type2] = [](param_t lhs, param_t rhs) -> return_t

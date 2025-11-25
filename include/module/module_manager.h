@@ -4,13 +4,13 @@
 #include "core/objects/module.h"
 #include "core/type.h"
 
-namespace meow::inline vm { class MeowEngine; }
-namespace meow::inline memory { class MemoryManager; }
+namespace meow { class MeowEngine; }
+namespace meow { class MemoryManager; }
 
-namespace meow::inline module {
+namespace meow {
 class ModuleManager {
    public:
-    explicit ModuleManager(meow::MemoryManager* heap, meow::vm::MeowEngine* engine) noexcept;
+    explicit ModuleManager(meow::MemoryManager* heap, meow::MeowEngine* engine) noexcept;
     ModuleManager(const ModuleManager&) = delete;
     ModuleManager(ModuleManager&&) = default;
     ModuleManager& operator=(const ModuleManager&) = delete;
@@ -31,6 +31,6 @@ class ModuleManager {
     meow::string_t entry_path_;
 
     meow::MemoryManager* heap_;
-    meow::vm::MeowEngine* engine_;
+    meow::MeowEngine* engine_;
 };
 }  // namespace meow::module

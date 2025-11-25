@@ -6,9 +6,9 @@
 #include "core/meow_object.h"
 #include "core/object_traits.h"
 
-namespace meow::inline core {
+namespace meow {
 
-using base_t = meow::variant<null_t, bool_t, int_t, float_t, native_fn_t, object_t>;
+using base_t = meow::variant<null_t, bool_t, int_t, float_t, native_t, object_t>;
 
 class Value {
 private:
@@ -66,7 +66,7 @@ public:
     [[nodiscard]] inline bool is_bool() const noexcept { return data_.holds<bool_t>(); }
     [[nodiscard]] inline bool is_int() const noexcept { return data_.holds<int_t>(); }
     [[nodiscard]] inline bool is_float() const noexcept { return data_.holds<float_t>(); }
-    [[nodiscard]] inline bool is_native_fn() const noexcept { return data_.holds<native_fn_t>(); }
+    [[nodiscard]] inline bool is_native() const noexcept { return data_.holds<native_t>(); }
 
     // --- Object type (generic) ---
     [[nodiscard]] inline bool is_object() const noexcept {
@@ -119,7 +119,7 @@ public:
     [[nodiscard]] inline bool as_bool() const noexcept { return data_.get<bool_t>(); }
     [[nodiscard]] inline int64_t as_int() const noexcept { return data_.get<int_t>(); }
     [[nodiscard]] inline double as_float() const noexcept { return data_.get<float_t>(); }
-    [[nodiscard]] inline native_fn_t as_native_fn() const noexcept { return data_.get<native_fn_t>(); }
+    [[nodiscard]] inline native_t as_native() const noexcept { return data_.get<native_t>(); }
     
     [[nodiscard]] inline meow::MeowObject* as_object() const noexcept {
         return data_.get<object_t>();
@@ -174,8 +174,8 @@ public:
     }
 
     template <typename Self>
-    [[nodiscard]] inline auto as_if_native_fn(this Self&& self) noexcept {
-        return self.data_.template get_if<native_fn_t>();
+    [[nodiscard]] inline auto as_if_native(this Self&& self) noexcept {
+        return self.data_.template get_if<native_t>();
     }
 
     // --- Object Types ---

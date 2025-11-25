@@ -7,12 +7,12 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "core/meow_object.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::inline core::inline objects {
+namespace meow {
 class ObjArray : public meow::ObjBase<ObjectType::ARRAY> {
 private:
     using container_t = std::vector<meow::value_t>;

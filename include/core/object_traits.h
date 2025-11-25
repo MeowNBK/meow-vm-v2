@@ -5,7 +5,7 @@
 #include "core/meow_object.h"
 #include "core/type.h"
 
-namespace meow::inline core {
+namespace meow {
 
 namespace detail {
 
@@ -15,37 +15,34 @@ struct object_traits {
                   "as_if<T> only works on types derived from MeowObject");
 };
 
-template <> struct object_traits<objects::ObjArray> {
+template <> struct object_traits<meow::ObjArray> {
     static constexpr ObjectType type_tag = ObjectType::ARRAY;
 };
-template <> struct object_traits<objects::ObjString> {
+template <> struct object_traits<meow::ObjString> {
     static constexpr ObjectType type_tag = ObjectType::STRING;
 };
-template <> struct object_traits<objects::ObjHashTable> {
+template <> struct object_traits<meow::ObjHashTable> {
     static constexpr ObjectType type_tag = ObjectType::HASH_TABLE;
 };
-template <> struct object_traits<objects::ObjInstance> {
+template <> struct object_traits<meow::ObjInstance> {
     static constexpr ObjectType type_tag = ObjectType::INSTANCE;
 };
-template <> struct object_traits<objects::ObjClass> {
+template <> struct object_traits<meow::ObjClass> {
     static constexpr ObjectType type_tag = ObjectType::CLASS;
 };
-template <> struct object_traits<objects::ObjBoundMethod> {
+template <> struct object_traits<meow::ObjBoundMethod> {
     static constexpr ObjectType type_tag = ObjectType::BOUND_METHOD;
 };
-template <> struct object_traits<objects::ObjUpvalue> {
+template <> struct object_traits<meow::ObjUpvalue> {
     static constexpr ObjectType type_tag = ObjectType::UPVALUE;
 };
-template <> struct object_traits<objects::ObjFunctionProto> {
+template <> struct object_traits<meow::ObjFunctionProto> {
     static constexpr ObjectType type_tag = ObjectType::PROTO;
 };
-template <> struct object_traits<objects::ObjClosure> {
+template <> struct object_traits<meow::ObjClosure> {
     static constexpr ObjectType type_tag = ObjectType::FUNCTION;
 };
-// template <> struct object_traits<objects::ObjNativeFunction> {
-//     static constexpr ObjectType type_tag = ObjectType::NATIVE_FN;
-// };
-template <> struct object_traits<objects::ObjModule> {
+template <> struct object_traits<meow::ObjModule> {
     static constexpr ObjectType type_tag = ObjectType::MODULE;
 };
 

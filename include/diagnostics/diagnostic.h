@@ -2,7 +2,7 @@
 
 #include "common/pch.h"
 
-namespace meow::inline diagnostics {
+namespace meow {
 
 enum class Severity { Note, Warning, Error, Total };
 

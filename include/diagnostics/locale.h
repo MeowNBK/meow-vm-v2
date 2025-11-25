@@ -2,7 +2,7 @@
 
 #include "diagnostics/diagnostic.h"
 
-namespace meow::inline diagnostics {
+namespace meow {
 
 /// ---------------------------------------------------------------------------
 /// 🗺️ SimpleLocaleSource

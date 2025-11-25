@@ -2,7 +2,7 @@
 
 #include "common/pch.h"
 
-namespace meow::inline vm {
+namespace meow {
 struct VMError : public std::runtime_error {
     explicit VMError(const std::string& message) : std::runtime_error(message) {}
 };

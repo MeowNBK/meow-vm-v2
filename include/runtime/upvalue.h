@@ -3,9 +3,9 @@
 #include "common/pch.h"
 #include "runtime/execution_context.h"
 #include "memory/memory_manager.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 
-namespace meow::inline runtime {
+namespace meow {
 inline meow::upvalue_t capture_upvalue(meow::ExecutionContext* context, meow::MemoryManager* heap, size_t register_index) noexcept {
     // Tìm kiếm các upvalue đã mở từ trên xuống dưới (chỉ số stack cao -> thấp)
     for (auto it = context->open_upvalues_.rbegin(); it != context->open_upvalues_.rend(); ++it) {

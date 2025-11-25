@@ -6,7 +6,7 @@
 
 #include "common/pch.h"
 
-namespace meow::inline module {
+namespace meow {
 
 // --- filesystem / string helpers ---
 std::filesystem::path get_executable_dir() noexcept;  // absolute dir of current executable

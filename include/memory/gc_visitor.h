@@ -1,13 +1,13 @@
 #pragma once
 
-#include "core/definitions.h"
+#include "common/definitions.h"
 
-namespace meow::inline core {
+namespace meow {
 class Value;
 struct MeowObject;
 }  // namespace meow::core
 
-namespace meow::inline memory {
+namespace meow {
 struct GCVisitor {
     virtual ~GCVisitor() = default;
     virtual void visit_value(meow::param_t value) noexcept = 0;

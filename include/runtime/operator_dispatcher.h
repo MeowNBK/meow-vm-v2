@@ -1,14 +1,14 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "core/op_codes.h"
 #include "core/value.h"
 #include "core/meow_object.h"
 
-namespace meow::inline memory { class MemoryManager; }
+namespace meow { class MemoryManager; }
 
-namespace meow::inline runtime {
+namespace meow {
 
 constexpr size_t NUM_VALUE_TYPES = static_cast<size_t>(meow::ValueType::TotalValueTypes);
 constexpr size_t NUM_OPCODES = static_cast<size_t>(meow::OpCode::TOTAL_OPCODES);
@@ -23,7 +23,7 @@ using unary_function_t = meow::return_t (*)(meow::param_t);
 }
 
 inline meow::ValueType get_value_type(meow::param_t value) noexcept {
-    using namespace meow::core;
+    using namespace meow;
     ValueType type = static_cast<ValueType>(value.index());
     if (type == ValueType::Object) {
         return static_cast<ValueType>(value.as_object()->get_type());
@@ -33,7 +33,7 @@ inline meow::ValueType get_value_type(meow::param_t value) noexcept {
 
 class OperatorDispatcher {
 public:
-    explicit OperatorDispatcher(memory::MemoryManager* heap) noexcept;
+    explicit OperatorDispatcher(meow::MemoryManager* heap) noexcept;
 
     [[nodiscard]] inline binary_function_t find(meow::OpCode op_code, meow::param_t left, meow::param_t right) const noexcept {
         auto left_type = get_value_type(left);
@@ -50,7 +50,7 @@ public:
     //     return binary_dispatch_table_[+op][+lhs][+rhs];
     // }
 private:
-    [[maybe_unused]] memory::MemoryManager* heap_;
+    [[maybe_unused]] meow::MemoryManager* heap_;
     binary_function_t binary_dispatch_table_[NUM_OPCODES][NUM_VALUE_TYPES][NUM_VALUE_TYPES];
     unary_function_t unary_dispatch_table_[NUM_OPCODES][NUM_VALUE_TYPES];
 };

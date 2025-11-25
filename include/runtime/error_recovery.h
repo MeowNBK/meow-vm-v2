@@ -6,7 +6,7 @@
 #include "vm/vm_error.h"
 #include "debug/print.h"
 
-namespace meow::inline runtime {
+namespace meow {
 inline bool recover_from_error(const meow::VMError& e, meow::ExecutionContext* context, meow::MemoryManager* heap) noexcept {
     meow::printl("Exception caught: {}", e.what());
 

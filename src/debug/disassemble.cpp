@@ -1,5 +1,5 @@
 #include "debug/disassemble.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "core/objects.h"
 #include "core/op_codes.h"
 #include "core/value.h"
@@ -54,13 +54,13 @@ static inline double read_f64_le(const uint8_t* code, size_t& ip, size_t code_si
     return std::bit_cast<double>(read_u64_le(code, ip, code_size));
 }
 
-std::string meow::debug::disassemble_chunk(const meow::Chunk& chunk) noexcept {
+std::string meow::disassemble_chunk(const meow::Chunk& chunk) noexcept {
     std::ostringstream os;
     const uint8_t* code = chunk.get_code();
     size_t code_size = chunk.get_code_size();
 
     auto value_to_string = [&](const meow::value_t& value) -> std::string {
-        using namespace meow::core;
+        using namespace meow;
         if (value.is_null()) return "<null>";
         if (value.is_bool()) return value.as_bool() ? "true" : "false";
         if (value.is_int()) return std::to_string(value.as_int());
@@ -72,7 +72,7 @@ std::string meow::debug::disassemble_chunk(const meow::Chunk& chunk) noexcept {
             temp_os << r;
             return temp_os.str();
         }
-        if (value.is_native_fn()) return "<native_fn>";
+        if (value.is_native()) return "<native_fn>";
 
         if (value.is_string()) {
             return "\"" + std::string(value.as_string()->c_str()) + "\"";
@@ -91,7 +91,7 @@ std::string meow::debug::disassemble_chunk(const meow::Chunk& chunk) noexcept {
         if (value.is_instance()) return "<instance>";
         if (value.is_bound_method()) return "<bound_method>";
         if (value.is_upvalue()) return "<upvalue>";
-        // if (value.is_native_fn()) return "<native_fn>";
+        // if (value.is_native()) return "<native_fn>";
         if (value.is_module()) {
             auto name = value.as_module()->get_file_name();
             return "<module '" + (name ? std::string(name->c_str()) : "??") + "'>";

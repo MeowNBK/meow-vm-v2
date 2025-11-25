@@ -1,7 +1,7 @@
 #include "core/objects.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::inline core::inline objects {
+namespace meow {
 
 void ObjArray::trace(meow::GCVisitor& visitor) const noexcept {
     for (const auto& element : elements_) {

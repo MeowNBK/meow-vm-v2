@@ -9,7 +9,7 @@
 
 #pragma once
 
-namespace meow::inline core {
+namespace meow {
 enum class OpCode : unsigned char {
     // --- Load/store ---
     LOAD_CONST, LOAD_NULL, LOAD_TRUE, LOAD_FALSE,

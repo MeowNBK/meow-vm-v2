@@ -9,7 +9,7 @@
 #include "common/pch.h"
 #include "core/meow_object.h"
 
-namespace meow::inline core::inline objects {
+namespace meow {
 class ObjString : public meow::ObjBase<ObjectType::STRING> {
 private:
     using storage_t = std::string;

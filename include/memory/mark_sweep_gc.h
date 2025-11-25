@@ -1,16 +1,16 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "memory/garbage_collector.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::inline runtime {
+namespace meow {
 struct ExecutionContext;
 struct BuiltinRegistry;
 }  // namespace meow::runtime
 
-namespace meow::inline memory {
+namespace meow {
 struct GCMetadata {
     bool is_marked_ = false;
 };

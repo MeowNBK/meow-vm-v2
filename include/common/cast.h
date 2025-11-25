@@ -1,12 +1,12 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "core/objects.h"
 #include "core/value.h"
 #include "debug/disassemble.h"
 
-namespace meow::inline common {
+namespace meow {
 
 inline int64_t to_int(meow::param_t value) noexcept {
     using i64_limits = std::numeric_limits<int64_t>;
@@ -184,9 +184,6 @@ inline std::string object_to_string(meow::object_t obj) noexcept {
             return "<module '" + (name ? std::string(name->c_str()) : "??") + "'>";
         }
 
-        // case meow::ObjectType::NATIVE_FN:
-        //     return "<native_fn>";
-
         case meow::ObjectType::FUNCTION: {
             auto name = reinterpret_cast<meow::function_t>(obj)->get_proto()->get_name();
             return "<function '" + (name ? std::string(name->c_str()) : "??") + "'>";
@@ -240,7 +237,7 @@ inline std::string to_string(meow::param_t value) noexcept {
             return str;
         },
         [](meow::bool_t val) -> std::string { return val ? "true" : "false"; },
-        [](meow::native_fn_t) -> std::string { return "<native_fn>"; },
+        [](meow::native_t) -> std::string { return "<native_fn>"; },
         [](meow::object_t obj) -> std::string {
             return detail::object_to_string(obj);
         }

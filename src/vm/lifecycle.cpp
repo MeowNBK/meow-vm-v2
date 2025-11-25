@@ -8,7 +8,7 @@
 #include "runtime/operator_dispatcher.h"
 #include "debug/print.h"
 
-using namespace meow::vm;
+using namespace meow;
 
 Machine::Machine(const std::string& entry_point_directory, const std::string& entry_path, int argc, char* argv[]) {
     args_.entry_point_directory_ = entry_point_directory;

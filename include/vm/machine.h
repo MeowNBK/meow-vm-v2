@@ -4,15 +4,15 @@
 #include "vm/meow_engine.h"
 #include "vm/vm_error.h"
 
-namespace meow::inline runtime {
+namespace meow {
     struct ExecutionContext;
     struct BuiltinRegistry;
     class OperatorDispatcher;
 }
-namespace meow::inline memory { class MemoryManager; }
-namespace meow::inline module { class ModuleManager; }
+namespace meow { class MemoryManager; }
+namespace meow { class ModuleManager; }
 
-namespace meow::inline vm {
+namespace meow {
 struct VMArgs {
     std::vector<std::string> command_line_arguments_;
     std::string entry_point_directory_;

@@ -1,8 +1,8 @@
 #pragma once
 
-namespace meow::inline memory { struct GCVisitor; }
+namespace meow { struct GCVisitor; }
 
-namespace meow::inline core {
+namespace meow {
 
 enum class ObjectType : uint8_t {
     ARRAY = 6,
@@ -14,7 +14,6 @@ enum class ObjectType : uint8_t {
     UPVALUE,
     PROTO,
     FUNCTION,
-    // NATIVE_FN,
     MODULE
 };
 

@@ -5,12 +5,12 @@
 #include "core/value.h"
 #include "runtime/chunk.h"
 
-namespace meow::inline loader {
+namespace meow {
 
-using namespace meow::core;
-using namespace meow::runtime;
-using namespace meow::memory;
-using namespace meow::objects;
+using namespace meow;
+using namespace meow;
+using namespace meow;
+using namespace meow;
 
 constexpr uint32_t MAGIC_NUMBER = 0x4D454F57; // "MEOW"
 constexpr uint32_t FORMAT_VERSION = 1;

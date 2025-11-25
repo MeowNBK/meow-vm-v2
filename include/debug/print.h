@@ -3,7 +3,7 @@
 #include "common/pch.h"
 #include <print>
 
-namespace meow::inline debug {
+namespace meow {
     
 template <typename... Args>
 inline void print(std::format_string<Args...> fmt, Args&&... args) {

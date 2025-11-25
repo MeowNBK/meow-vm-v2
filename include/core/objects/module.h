@@ -10,13 +10,13 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/definitions.h"
+#include "common/definitions.h"
 #include "core/meow_object.h"
 #include "core/type.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
-namespace meow::inline core::inline objects {
+namespace meow {
 class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
    private:
     using string_t = meow::string_t;

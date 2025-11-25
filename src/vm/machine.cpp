@@ -19,12 +19,12 @@
 #include "core/objects/module.h"
 #include "core/objects/oop.h"
 
-using namespace meow::vm;
-using namespace meow::core;
-using namespace meow::runtime;
-using namespace meow::memory;
-using namespace meow::debug;
-using namespace meow::common;
+using namespace meow;
+using namespace meow;
+using namespace meow;
+using namespace meow;
+using namespace meow;
+using namespace meow;
 
 #include "handlers/load.inl"
 #include "handlers/memory.inl"
@@ -281,8 +281,8 @@ dispatch_start:
             }
             Value& callee = REGISTER(fn_reg);
 
-            if (callee.is_native_fn()) {
-                native_fn_t fn = callee.as_native_fn();
+            if (callee.is_native()) {
+                native_t fn = callee.as_native();
                 
                 Value* args_ptr = &REGISTER(arg_start); 
                 

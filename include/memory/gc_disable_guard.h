@@ -2,7 +2,7 @@
 
 #include "memory/memory_manager.h"
 
-namespace meow::inline memory {
+namespace meow {
 class GCDisableGuard {
    private:
     MemoryManager* heap_;

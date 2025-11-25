@@ -4,7 +4,7 @@
 #include "runtime/execution_context.h"
 #include <print>
 
-namespace meow::inline memory {
+namespace meow {
 
 MarkSweepGC::~MarkSweepGC() noexcept {
     std::cout << "[destroy] Đang xử lí các object khi hủy GC" << std::endl;

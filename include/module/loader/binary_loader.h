@@ -5,9 +5,9 @@
 #include "runtime/chunk.h"
 #include "core/objects/function.h"
 
-namespace meow::inline memory { class MemoryManager; }
+namespace meow { class MemoryManager; }
 
-namespace meow::inline loader {
+namespace meow {
 
 class BinaryLoaderError : public std::runtime_error {
 public:
