@@ -30,7 +30,7 @@ inline bool recover_from_error(const VMError& e, ExecutionContext* context, Memo
     // 3. Khôi phục Register Stack
     context->registers_.resize(handler.stack_depth_);
 
-    // 4. Khôi phục Context
+    // 4. Khôi phục ExecutionContext
     context->current_frame_ = &context->call_stack_.back();
     context->current_base_ = context->current_frame_->start_reg_;
     

@@ -6,10 +6,9 @@
 
 namespace meow {
 class Chunk {
-   public:
+public:
     Chunk() = default;
-    Chunk(std::vector<uint8_t>&& code, std::vector<Value>&& constants) noexcept : code_(std::move(code)), constant_pool_(std::move(constants)) {
-    }
+    Chunk(std::vector<uint8_t>&& code, std::vector<Value>&& constants) noexcept : code_(std::move(code)), constant_pool_(std::move(constants)) {}
 
     // --- Modifiers ---
     inline void write_byte(uint8_t byte) {
@@ -70,9 +69,6 @@ class Chunk {
     [[nodiscard]] inline value_t& get_constant_ref(size_t index) noexcept {
         return constant_pool_[index];
     }
-    [[nodiscard]] inline const uint8_t* get_code_buffer_ptr() const noexcept {
-        return code_.data();
-    }
 
     inline bool patch_u16(size_t offset, uint16_t value) noexcept {
         if (offset + 1 >= code_.size()) return false;
@@ -83,7 +79,7 @@ class Chunk {
         return true;
     }
 
-   private:
+private:
     std::vector<uint8_t> code_;
     std::vector<Value> constant_pool_;
 };

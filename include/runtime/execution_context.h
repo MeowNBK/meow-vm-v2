@@ -5,29 +5,10 @@
 #include "core/objects/function.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
+#include "runtime/call_frame.h"
+#include "runtime/exception_handler.h"
 
 namespace meow {
-struct CallFrame {
-    function_t function_;
-    module_t module_;
-    size_t start_reg_;
-    size_t ret_reg_;
-    const uint8_t* ip_;
-    CallFrame(function_t function, module_t module, size_t start_reg, size_t ret_reg, const uint8_t* ip)
-        : function_(function), module_(module), start_reg_(start_reg), ret_reg_(ret_reg), ip_(ip) {
-    }
-};
-
-struct ExceptionHandler {
-    size_t catch_ip_;
-    size_t frame_depth_; // Số lượng frame tại thời điểm try
-    size_t stack_depth_; // Số lượng register tại thời điểm try
-    size_t error_reg_;   // Register để lưu lỗi (0xFFFF nếu không cần)
-
-    ExceptionHandler(size_t catch_ip = 0, size_t frame_depth = 0, size_t stack_depth = 0, size_t error_reg = static_cast<size_t>(-1)) 
-        : catch_ip_(catch_ip), frame_depth_(frame_depth), stack_depth_(stack_depth), error_reg_(error_reg) {
-    }
-};
 
 struct ExecutionContext {
     std::vector<CallFrame> call_stack_;

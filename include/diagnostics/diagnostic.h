@@ -12,7 +12,7 @@ struct Span {
     size_t end_line = 0, end_col = 0;
 };
 
-struct CallFrame {
+struct StackFrame {
     std::string function;
     std::string file;
     size_t line = 0, col = 0;
@@ -32,7 +32,7 @@ struct Diagnostic {
     std::unordered_map<std::string, std::string> args;
     std::vector<Span> spans;
     std::vector<Diagnostic> notes;
-    std::vector<CallFrame> callstack;
+    std::vector<StackFrame> callstack;
 };
 
 struct RenderOptions {

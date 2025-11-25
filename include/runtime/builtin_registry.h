@@ -8,11 +8,11 @@
 
 namespace meow {
 struct BuiltinRegistry {
-    std::unordered_map<string_t, std::unordered_map<string_t, Value>> methods_;
-    std::unordered_map<string_t, std::unordered_map<string_t, Value>> getters_;
+    std::unordered_map<string_t, std::unordered_map<string_t, Value>> methods;
+    std::unordered_map<string_t, std::unordered_map<string_t, Value>> getters;
 
     inline void trace(GCVisitor& visitor) const noexcept {
-        for (const auto& [name, method] : methods_) {
+        for (const auto& [name, method] : methods) {
             visitor.visit_object(name);
             for (const auto& [key, value] : method) {
                 visitor.visit_object(key);
@@ -20,7 +20,7 @@ struct BuiltinRegistry {
             }
         }
 
-        for (const auto& [name, getter] : getters_) {
+        for (const auto& [name, getter] : getters) {
             visitor.visit_object(name);
             for (const auto& [key, value] : getter) {
                 visitor.visit_object(key);
