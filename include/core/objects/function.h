@@ -12,7 +12,7 @@
 #include "common/pch.h"
 #include "common/definitions.h"
 #include "core/meow_object.h"
-#include "core/type.h"
+#include "common/definitions.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 #include "runtime/chunk.h"
@@ -25,9 +25,9 @@ struct UpvalueDesc {
     }
 };
 
-class ObjUpvalue : public meow::ObjBase<ObjectType::UPVALUE> {
+class ObjUpvalue : public ObjBase<ObjectType::UPVALUE> {
    private:
-    using visitor_t = meow::GCVisitor;
+    using visitor_t = GCVisitor;
 
     enum class State { OPEN, CLOSED };
     State state_ = State::OPEN;
@@ -37,14 +37,14 @@ class ObjUpvalue : public meow::ObjBase<ObjectType::UPVALUE> {
    public:
     explicit ObjUpvalue(size_t index = 0) noexcept : index_(index) {
     }
-    inline void close(meow::param_t value) noexcept {
+    inline void close(param_t value) noexcept {
         closed_ = value;
         state_ = State::CLOSED;
     }
     inline bool is_closed() const noexcept {
         return state_ == State::CLOSED;
     }
-    inline meow::return_t get_value() const noexcept {
+    inline return_t get_value() const noexcept {
         return closed_;
     }
     inline size_t get_index() const noexcept {
@@ -54,11 +54,11 @@ class ObjUpvalue : public meow::ObjBase<ObjectType::UPVALUE> {
     void trace(visitor_t& visitor) const noexcept override;
 };
 
-class ObjFunctionProto : public meow::ObjBase<ObjectType::PROTO> {
+class ObjFunctionProto : public ObjBase<ObjectType::PROTO> {
    private:
-    using chunk_t = meow::Chunk;
-    using string_t = meow::string_t;
-    using visitor_t = meow::GCVisitor;
+    using chunk_t = Chunk;
+    using string_t = string_t;
+    using visitor_t = GCVisitor;
 
     size_t num_registers_;
     size_t num_upvalues_;
@@ -100,11 +100,11 @@ class ObjFunctionProto : public meow::ObjBase<ObjectType::PROTO> {
     void trace(visitor_t& visitor) const noexcept override;
 };
 
-class ObjClosure : public meow::ObjBase<ObjectType::FUNCTION> {
+class ObjClosure : public ObjBase<ObjectType::FUNCTION> {
    private:
-    using proto_t = meow::proto_t;
-    using upvalue_t = meow::upvalue_t;
-    using visitor_t = meow::GCVisitor;
+    using proto_t = proto_t;
+    using upvalue_t = upvalue_t;
+    using visitor_t = GCVisitor;
 
     proto_t proto_;
     std::vector<upvalue_t> upvalues_;
@@ -131,4 +131,4 @@ class ObjClosure : public meow::ObjBase<ObjectType::FUNCTION> {
 
     void trace(visitor_t& visitor) const noexcept override;
 };
-}  // namespace meow::objects
+}

@@ -5,14 +5,12 @@
 #include "vm/vm_error.h"
 
 namespace meow {
-    struct ExecutionContext;
-    struct BuiltinRegistry;
-    class OperatorDispatcher;
-}
-namespace meow { class MemoryManager; }
-namespace meow { class ModuleManager; }
+struct ExecutionContext;
+struct BuiltinRegistry;
+class OperatorDispatcher;
+class MemoryManager;
+class ModuleManager;
 
-namespace meow {
 struct VMArgs {
     std::vector<std::string> command_line_arguments_;
     std::string entry_point_directory_;
@@ -33,11 +31,11 @@ public:
     void interpret() noexcept;
 private:
     // --- Subsystems ---
-    std::unique_ptr<meow::ExecutionContext> context_;
-    std::unique_ptr<meow::BuiltinRegistry> builtins_;
-    std::unique_ptr<meow::MemoryManager> heap_;
-    std::unique_ptr<meow::ModuleManager> mod_manager_;
-    std::unique_ptr<meow::OperatorDispatcher> op_dispatcher_;
+    std::unique_ptr<ExecutionContext> context_;
+    std::unique_ptr<BuiltinRegistry> builtins_;
+    std::unique_ptr<MemoryManager> heap_;
+    std::unique_ptr<ModuleManager> mod_manager_;
+    std::unique_ptr<OperatorDispatcher> op_dispatcher_;
 
     // --- Runtime arguments ---
     VMArgs args_;
@@ -80,9 +78,9 @@ private:
     inline void op_get_super(const uint8_t*& ip);
     inline void op_throw(const uint8_t*& ip);
     inline void op_setup_try(const uint8_t*& ip);
-    inline void op_pop_try();  // Không cần 'ip'
+    inline void op_pop_try();
     inline void op_export(const uint8_t*& ip);
     inline void op_get_export(const uint8_t*& ip);
     inline void op_import_all(const uint8_t*& ip);
 };
-}  // namespace meow::vm
+}

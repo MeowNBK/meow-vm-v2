@@ -20,11 +20,6 @@
 #include "core/objects/oop.h"
 
 using namespace meow;
-using namespace meow;
-using namespace meow;
-using namespace meow;
-using namespace meow;
-using namespace meow;
 
 #include "handlers/load.inl"
 #include "handlers/memory.inl"
@@ -246,7 +241,7 @@ dispatch_start:
         op_JUMP_IF_FALSE: {
             uint16_t reg = READ_U16();
             uint16_t target = READ_ADDRESS();
-            bool is_truthy_val = meow::to_bool(REGISTER(reg));
+            bool is_truthy_val = to_bool(REGISTER(reg));
             if (!is_truthy_val) {
                 ip = CURRENT_CHUNK().get_code() + target;
             }
@@ -255,7 +250,7 @@ dispatch_start:
         op_JUMP_IF_TRUE: {
             uint16_t reg = READ_U16();
             uint16_t target = READ_ADDRESS();
-            bool is_truthy_val = meow::to_bool(REGISTER(reg));
+            bool is_truthy_val = to_bool(REGISTER(reg));
             if (is_truthy_val) {
                 ip = CURRENT_CHUNK().get_code() + target;
             }
@@ -493,7 +488,7 @@ dispatch_start:
         }
     } catch (const VMError& e) {
         // Gọi hàm xử lý riêng
-        if (meow::recover_from_error(e, context_.get(), heap_.get())) {
+        if (recover_from_error(e, context_.get(), heap_.get())) {
             // Nếu cứu được, cập nhật lại IP cục bộ từ frame và nhảy tiếp
             ip = context_->current_frame_->ip_;
             goto dispatch_start;

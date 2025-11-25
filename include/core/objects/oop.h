@@ -12,17 +12,17 @@
 #include "common/pch.h"
 #include "common/definitions.h"
 #include "core/meow_object.h"
-#include "core/type.h"
+#include "common/definitions.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
 namespace meow {
-class ObjClass : public meow::ObjBase<ObjectType::CLASS> {
+class ObjClass : public ObjBase<ObjectType::CLASS> {
    private:
-    using string_t = meow::string_t;
-    using class_t = meow::class_t;
-    using method_map = std::unordered_map<string_t, meow::value_t>;
-    using visitor_t = meow::GCVisitor;
+    using string_t = string_t;
+    using class_t = class_t;
+    using method_map = std::unordered_map<string_t, value_t>;
+    using visitor_t = GCVisitor;
 
     string_t name_;
     class_t superclass_;
@@ -47,22 +47,22 @@ class ObjClass : public meow::ObjBase<ObjectType::CLASS> {
     [[nodiscard]] inline bool has_method(string_t name) const noexcept {
         return methods_.find(name) != methods_.end();
     }
-    [[nodiscard]] inline meow::return_t get_method(string_t name) noexcept {
+    [[nodiscard]] inline return_t get_method(string_t name) noexcept {
         return methods_[name];
     }
-    inline void set_method(string_t name, meow::return_t value) noexcept {
+    inline void set_method(string_t name, return_t value) noexcept {
         methods_[name] = value;
     }
 
     void trace(visitor_t& visitor) const noexcept override;
 };
 
-class ObjInstance : public meow::ObjBase<ObjectType::INSTANCE> {
+class ObjInstance : public ObjBase<ObjectType::INSTANCE> {
    private:
-    using string_t = meow::string_t;
-    using class_t = meow::class_t;
-    using field_map = std::unordered_map<string_t, meow::value_t>;
-    using visitor_t = meow::GCVisitor;
+    using string_t = string_t;
+    using class_t = class_t;
+    using field_map = std::unordered_map<string_t, value_t>;
+    using visitor_t = GCVisitor;
 
     class_t klass_;
     field_map fields_;
@@ -80,10 +80,10 @@ class ObjInstance : public meow::ObjBase<ObjectType::INSTANCE> {
     }
 
     // --- Fields ---
-    [[nodiscard]] inline meow::return_t get_field(string_t name) noexcept {
+    [[nodiscard]] inline return_t get_field(string_t name) noexcept {
         return fields_[name];
     }
-    inline void set_field(string_t name, meow::param_t value) noexcept {
+    inline void set_field(string_t name, param_t value) noexcept {
         fields_[name] = value;
     }
     [[nodiscard]] inline bool has_field(string_t name) const {
@@ -93,11 +93,11 @@ class ObjInstance : public meow::ObjBase<ObjectType::INSTANCE> {
     void trace(visitor_t& visitor) const noexcept override;
 };
 
-class ObjBoundMethod : public meow::ObjBase<ObjectType::BOUND_METHOD> {
+class ObjBoundMethod : public ObjBase<ObjectType::BOUND_METHOD> {
    private:
-    using instance_t = meow::instance_t;
-    using function_t = meow::function_t;
-    using visitor_t = meow::GCVisitor;
+    using instance_t = instance_t;
+    using function_t = function_t;
+    using visitor_t = GCVisitor;
 
     instance_t instance_;
     function_t function_;
@@ -115,4 +115,4 @@ class ObjBoundMethod : public meow::ObjBase<ObjectType::BOUND_METHOD> {
 
     void trace(visitor_t& visitor) const noexcept override;
 };
-}  // namespace meow::objects
+}

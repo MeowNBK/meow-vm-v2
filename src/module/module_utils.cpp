@@ -121,7 +121,7 @@ struct key_hash {
 };
 static std::mutex s_cache_mutex;
 static std::unordered_map<cache_key, std::filesystem::path, key_hash> s_root_cache;
-}  // namespace
+}
 
 std::filesystem::path detect_root_cached(const std::string& config_filename, const std::string& token, bool treat_bin_as_parent, std::function<std::filesystem::path()> exe_dir_provider) noexcept {
     try {
@@ -294,4 +294,4 @@ void close_native_library(void* handle) noexcept {
 #endif
 }
 
-}  // namespace meow::module
+}

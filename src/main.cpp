@@ -5,6 +5,7 @@
 #include "vm/machine.h"
 
 namespace fs = std::filesystem;
+using namespace meow;
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -25,11 +26,11 @@ int main(int argc, char* argv[]) {
         fs::path abs_path = fs::absolute(input_path);
         std::string root_dir = abs_path.parent_path().string();
         std::string entry_file = abs_path.filename().string();
-        meow::Machine vm(root_dir, entry_file, argc, argv);
+        Machine vm(root_dir, entry_file, argc, argv);
         
         vm.interpret();
 
-    } catch (const meow::VMError& e) {
+    } catch (const VMError& e) {
         std::println(stderr, "VM Runtime Error: {}", e.what());
         return 1;
     } catch (const std::exception& e) {

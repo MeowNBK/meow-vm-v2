@@ -11,7 +11,7 @@
 namespace meow {
 template <typename...>
 class variant;
-}  // namespace meow
+}
 
 namespace meow::utils {
 
@@ -156,7 +156,7 @@ struct flatten_list_implement<Head, Tail...> {
 template <typename... Ts>
 using flattened_unique_t = typename flatten_list_implement<Ts...>::type;
 
-}  // namespace detail
+}
 
 // overload helper for visit
 template <class... Fs>
@@ -166,4 +166,4 @@ struct overload : Fs... {
 template <class... Fs>
 overload(Fs...) -> overload<Fs...>;
 
-}  // namespace meow::utils
+}

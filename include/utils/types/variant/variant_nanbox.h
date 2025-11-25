@@ -256,4 +256,4 @@ private:
 template <typename... Ts>
 MEOW_ALWAYS_INLINE void swap(NaNBoxedVariant<Ts...>& a, NaNBoxedVariant<Ts...>& b) noexcept { a.swap(b); }
 
-} // namespace meow::utils
+}

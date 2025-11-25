@@ -12,17 +12,17 @@
 #include "common/pch.h"
 #include "common/definitions.h"
 #include "core/meow_object.h"
-#include "core/type.h"
+#include "common/definitions.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
 namespace meow {
-class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
+class ObjModule : public ObjBase<ObjectType::MODULE> {
    private:
-    using string_t = meow::string_t;
-    using proto_t = meow::proto_t;
+    using string_t = string_t;
+    using proto_t = proto_t;
     using module_map = std::unordered_map<string_t, value_t>;
-    using visitor_t = meow::GCVisitor;
+    using visitor_t = GCVisitor;
 
     enum class State { EXECUTING, EXECUTED };
 
@@ -39,10 +39,10 @@ class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
     }
 
     // --- Globals ---
-    [[nodiscard]] inline meow::return_t get_global(string_t name) noexcept {
+    [[nodiscard]] inline return_t get_global(string_t name) noexcept {
         return globals_[name];
     }
-    inline void set_global(string_t name, meow::param_t value) noexcept {
+    inline void set_global(string_t name, param_t value) noexcept {
         globals_[name] = value;
     }
     [[nodiscard]] inline bool has_global(string_t name) {
@@ -55,10 +55,10 @@ class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
     }
 
     // --- Exports ---
-    [[nodiscard]] inline meow::return_t get_export(string_t name) noexcept {
+    [[nodiscard]] inline return_t get_export(string_t name) noexcept {
         return exports_[name];
     }
-    inline void set_export(string_t name, meow::param_t value) noexcept {
+    inline void set_export(string_t name, param_t value) noexcept {
         exports_[name] = value;
     }
     [[nodiscard]] inline bool has_export(string_t name) {
@@ -105,4 +105,4 @@ class ObjModule : public meow::ObjBase<ObjectType::MODULE> {
 
     void trace(visitor_t& visitor) const noexcept override;
 };
-}  // namespace meow::objects
+}

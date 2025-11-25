@@ -1,8 +1,7 @@
 #pragma once
 
-namespace meow { struct GCVisitor; }
-
 namespace meow {
+struct GCVisitor;
 
 enum class ObjectType : uint8_t {
     ARRAY = 6,
@@ -23,7 +22,7 @@ struct MeowObject {
     explicit MeowObject(ObjectType type_tag) noexcept : type(type_tag) {}
     
     virtual ~MeowObject() = default;
-    virtual void trace(meow::GCVisitor& visitor) const noexcept = 0;
+    virtual void trace(GCVisitor& visitor) const noexcept = 0;
 
     [[nodiscard]] inline ObjectType get_type() const noexcept { return type; }
 };
@@ -33,4 +32,4 @@ struct ObjBase : public MeowObject {
     ObjBase() noexcept : MeowObject(type_tag) {}
 };
 
-}  // namespace meow::core
+}

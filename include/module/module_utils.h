@@ -62,4 +62,4 @@ void* open_native_library(const std::string& path) noexcept;
 void* get_native_symbol(void* handle, const char* symbol_name) noexcept;
 void close_native_library(void* handle) noexcept;
 
-}  // namespace meow::module
+}

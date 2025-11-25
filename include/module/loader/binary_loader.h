@@ -1,14 +1,12 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/type.h"
+#include "common/definitions.h"
 #include "runtime/chunk.h"
 #include "core/objects/function.h"
 
-namespace meow { class MemoryManager; }
-
 namespace meow {
-
+class MemoryManager;
 class BinaryLoaderError : public std::runtime_error {
 public:
     explicit BinaryLoaderError(const std::string& msg) : std::runtime_error(msg) {}
@@ -16,8 +14,8 @@ public:
 
 class BinaryLoader {
 public:
-    BinaryLoader(meow::MemoryManager* heap, const std::vector<uint8_t>& data);
-    meow::proto_t load_module();
+    BinaryLoader(MemoryManager* heap, const std::vector<uint8_t>& data);
+    proto_t load_module();
 
 private:
     // --- Patching Structure ---
@@ -27,11 +25,11 @@ private:
         uint32_t target_idx;   // Index của Proto đích (Child) mà nó trỏ tới
     };
 
-    meow::MemoryManager* heap_;
+    MemoryManager* heap_;
     const std::vector<uint8_t>& data_;
     size_t cursor_ = 0;
 
-    std::vector<meow::proto_t> loaded_protos_;
+    std::vector<proto_t> loaded_protos_;
     std::vector<Patch> patches_;
 
     // --- Readers ---
@@ -41,13 +39,13 @@ private:
     uint32_t read_u32();
     uint64_t read_u64();
     double   read_f64();
-    meow::string_t read_string();
+    string_t read_string();
     
-    meow::Value read_constant(size_t current_proto_idx, size_t current_const_idx);
-    meow::proto_t read_prototype(size_t current_proto_idx);
+    Value read_constant(size_t current_proto_idx, size_t current_const_idx);
+    proto_t read_prototype(size_t current_proto_idx);
     
     void check_magic();
     void link_prototypes();
 };
 
-} // namespace meow::loader
+}

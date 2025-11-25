@@ -7,12 +7,8 @@
 #include "module/module_utils.h"
 #include "vm/meow_engine.h"
 #include "module/loader/binary_loader.h"
-namespace meow {
 
-using namespace meow;
-using namespace meow;
-using namespace meow;
-using namespace meow;
+namespace meow {
 
 ModuleManager::ModuleManager(MemoryManager* heap, MeowEngine* engine) noexcept
     : heap_(heap), engine_(engine) {}
@@ -151,4 +147,4 @@ module_t ModuleManager::load_module(string_t module_path_obj, string_t importer_
     return meow_module;
 }
 
-}  // namespace meow::module
+}

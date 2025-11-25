@@ -8,32 +8,29 @@
 namespace meow {
 struct ExecutionContext;
 struct BuiltinRegistry;
-}  // namespace meow::runtime
-
-namespace meow {
 struct GCMetadata {
     bool is_marked_ = false;
 };
 
 class MarkSweepGC : public GarbageCollector, public GCVisitor {
 public:
-    explicit MarkSweepGC(meow::ExecutionContext* context, meow::BuiltinRegistry* builtins) noexcept : context_(context), builtins_(builtins) {
+    explicit MarkSweepGC(ExecutionContext* context, BuiltinRegistry* builtins) noexcept : context_(context), builtins_(builtins) {
     }
     ~MarkSweepGC() noexcept override;
 
     // -- Collector ---
-    void register_object(const meow::MeowObject* object) override;
+    void register_object(const MeowObject* object) override;
     size_t collect() noexcept override;
 
     // --- Visitor ---
-    void visit_value(meow::param_t value) noexcept override;
-    void visit_object(const meow::MeowObject* object) noexcept override;
+    void visit_value(param_t value) noexcept override;
+    void visit_object(const MeowObject* object) noexcept override;
 private:
-    std::unordered_map<const meow::MeowObject*, GCMetadata> metadata_;
-    meow::ExecutionContext* context_ = nullptr;
-    meow::BuiltinRegistry* builtins_ = nullptr;
+    std::unordered_map<const MeowObject*, GCMetadata> metadata_;
+    ExecutionContext* context_ = nullptr;
+    BuiltinRegistry* builtins_ = nullptr;
 
-    void mark(const meow::MeowObject* object);
+    void mark(const MeowObject* object);
 
 };
-}  // namespace meow::memory
+}

@@ -2,16 +2,16 @@
 
 #include "common/pch.h"
 #include "core/objects/string.h"
-#include "core/type.h"
+#include "common/definitions.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
 
 namespace meow {
 struct BuiltinRegistry {
-    std::unordered_map<meow::string_t, std::unordered_map<meow::string_t, meow::Value>> methods_;
-    std::unordered_map<meow::string_t, std::unordered_map<meow::string_t, meow::Value>> getters_;
+    std::unordered_map<string_t, std::unordered_map<string_t, Value>> methods_;
+    std::unordered_map<string_t, std::unordered_map<string_t, Value>> getters_;
 
-    inline void trace(meow::GCVisitor& visitor) const noexcept {
+    inline void trace(GCVisitor& visitor) const noexcept {
         for (const auto& [name, method] : methods_) {
             visitor.visit_object(name);
             for (const auto& [key, value] : method) {
@@ -29,4 +29,4 @@ struct BuiltinRegistry {
         }
     }
 };
-}  // namespace meow::runtime
+}

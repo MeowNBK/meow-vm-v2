@@ -74,4 +74,4 @@ struct SimpleLocaleSource final : public LocaleSource {
     }
 };
 
-}  // namespace meow::diagnostics
+}

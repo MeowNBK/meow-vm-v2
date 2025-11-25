@@ -13,10 +13,10 @@
 #include "memory/gc_visitor.h"
 
 namespace meow {
-class ObjArray : public meow::ObjBase<ObjectType::ARRAY> {
+class ObjArray : public ObjBase<ObjectType::ARRAY> {
 private:
-    using container_t = std::vector<meow::value_t>;
-    using visitor_t = meow::GCVisitor;
+    using container_t = std::vector<value_t>;
+    using visitor_t = GCVisitor;
 
     container_t elements_;
 public:
@@ -24,7 +24,7 @@ public:
     ObjArray() = default;
     explicit ObjArray(const container_t& elements) : elements_(elements) {}
     explicit ObjArray(container_t&& elements) noexcept : elements_(std::move(elements)) {}
-    explicit ObjArray(std::initializer_list<meow::value_t> elements) : elements_(elements) {}
+    explicit ObjArray(std::initializer_list<value_t> elements) : elements_(elements) {}
 
     // --- Rule of 5 ---
     ObjArray(const ObjArray&) = delete;
@@ -110,4 +110,4 @@ public:
 
     void trace(visitor_t& visitor) const noexcept override;
 };
-}  // namespace meow::objects
+}

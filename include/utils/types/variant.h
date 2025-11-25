@@ -56,7 +56,7 @@ struct select_backend_impl<utils::detail::type_list<Ts...>> {
     static constexpr bool use_nanbox = can_nanbox && small_enough && all_nanboxable;
     using type = std::conditional_t<use_nanbox, utils::NaNBoxedVariant<Ts...>, utils::FallbackVariant<Ts...>>;
 };
-}  // namespace detail_backend
+}
 
 template <typename... Args>
 class variant {
@@ -382,4 +382,4 @@ decltype(auto) visit(variant<Ts...>&& v, Fs&&... fs) {
     return std::move(v).visit(overload{std::forward<Fs>(fs)...});
 }
 
-}  // namespace meow
+}

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "core/meow_object.h"
-#include "core/type.h"
+#include "common/definitions.h"
 
 namespace meow {
 
@@ -15,36 +15,36 @@ struct object_traits {
                   "as_if<T> only works on types derived from MeowObject");
 };
 
-template <> struct object_traits<meow::ObjArray> {
+template <> struct object_traits<ObjArray> {
     static constexpr ObjectType type_tag = ObjectType::ARRAY;
 };
-template <> struct object_traits<meow::ObjString> {
+template <> struct object_traits<ObjString> {
     static constexpr ObjectType type_tag = ObjectType::STRING;
 };
-template <> struct object_traits<meow::ObjHashTable> {
+template <> struct object_traits<ObjHashTable> {
     static constexpr ObjectType type_tag = ObjectType::HASH_TABLE;
 };
-template <> struct object_traits<meow::ObjInstance> {
+template <> struct object_traits<ObjInstance> {
     static constexpr ObjectType type_tag = ObjectType::INSTANCE;
 };
-template <> struct object_traits<meow::ObjClass> {
+template <> struct object_traits<ObjClass> {
     static constexpr ObjectType type_tag = ObjectType::CLASS;
 };
-template <> struct object_traits<meow::ObjBoundMethod> {
+template <> struct object_traits<ObjBoundMethod> {
     static constexpr ObjectType type_tag = ObjectType::BOUND_METHOD;
 };
-template <> struct object_traits<meow::ObjUpvalue> {
+template <> struct object_traits<ObjUpvalue> {
     static constexpr ObjectType type_tag = ObjectType::UPVALUE;
 };
-template <> struct object_traits<meow::ObjFunctionProto> {
+template <> struct object_traits<ObjFunctionProto> {
     static constexpr ObjectType type_tag = ObjectType::PROTO;
 };
-template <> struct object_traits<meow::ObjClosure> {
+template <> struct object_traits<ObjClosure> {
     static constexpr ObjectType type_tag = ObjectType::FUNCTION;
 };
-template <> struct object_traits<meow::ObjModule> {
+template <> struct object_traits<ObjModule> {
     static constexpr ObjectType type_tag = ObjectType::MODULE;
 };
 
-} // namespace detail
-} // namespace meow::core
+}
+}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/pch.h"
-#include "core/type.h"
+#include "common/definitions.h"
 #include "utils/types/variant.h"
 #include "core/meow_object.h"
 #include "core/object_traits.h"
@@ -121,7 +121,7 @@ public:
     [[nodiscard]] inline double as_float() const noexcept { return data_.get<float_t>(); }
     [[nodiscard]] inline native_t as_native() const noexcept { return data_.get<native_t>(); }
     
-    [[nodiscard]] inline meow::MeowObject* as_object() const noexcept {
+    [[nodiscard]] inline MeowObject* as_object() const noexcept {
         return data_.get<object_t>();
     }
     [[nodiscard]] inline array_t as_array() const noexcept {
@@ -313,4 +313,4 @@ public:
     }
 };
 
-}  // namespace meow::core
+}

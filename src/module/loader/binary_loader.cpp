@@ -7,11 +7,6 @@
 
 namespace meow {
 
-using namespace meow;
-using namespace meow;
-using namespace meow;
-using namespace meow;
-
 constexpr uint32_t MAGIC_NUMBER = 0x4D454F57; // "MEOW"
 constexpr uint32_t FORMAT_VERSION = 1;
 
@@ -203,4 +198,4 @@ proto_t BinaryLoader::load_module() {
     return loaded_protos_[main_proto_index];
 }
 
-} // namespace meow::loader
+}

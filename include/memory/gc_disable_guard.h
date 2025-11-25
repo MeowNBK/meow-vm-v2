@@ -19,4 +19,4 @@ class GCDisableGuard {
         if (heap_) heap_->enable_gc();
     }
 };
-}  // namespace meow::memory
+}

@@ -5,11 +5,9 @@
 #include "core/value.h"
 #include "runtime/chunk.h"
 
-using meow::OpCode;
-using meow::Chunk;
-using meow::Value;
+namespace meow {
 
-static constexpr std::array<std::string_view, static_cast<size_t>(meow::OpCode::TOTAL_OPCODES)> opcode_strings = {
+static constexpr std::array<std::string_view, static_cast<size_t>(OpCode::TOTAL_OPCODES)> opcode_strings = {
     "LOAD_CONST", "LOAD_NULL",     "LOAD_TRUE",     "LOAD_FALSE", "LOAD_INT",   "LOAD_FLOAT",   "MOVE",        "ADD",       "SUB",
     "MUL",        "DIV",           "MOD",           "POW",        "EQ",         "NEQ",          "GT",          "GE",        "LT",
     "LE",         "NEG",           "NOT",           "GET_GLOBAL", "SET_GLOBAL", "GET_UPVALUE",  "SET_UPVALUE", "CLOSURE",   "CLOSE_UPVALUES",
@@ -54,13 +52,12 @@ static inline double read_f64_le(const uint8_t* code, size_t& ip, size_t code_si
     return std::bit_cast<double>(read_u64_le(code, ip, code_size));
 }
 
-std::string meow::disassemble_chunk(const meow::Chunk& chunk) noexcept {
+std::string disassemble_chunk(const Chunk& chunk) noexcept {
     std::ostringstream os;
     const uint8_t* code = chunk.get_code();
     size_t code_size = chunk.get_code_size();
 
-    auto value_to_string = [&](const meow::value_t& value) -> std::string {
-        using namespace meow;
+    auto value_to_string = [&](const value_t& value) -> std::string {
         if (value.is_null()) return "<null>";
         if (value.is_bool()) return value.as_bool() ? "true" : "false";
         if (value.is_int()) return std::to_string(value.as_int());
@@ -378,4 +375,6 @@ std::string meow::disassemble_chunk(const meow::Chunk& chunk) noexcept {
         os << "\n";
     }
     return os.str();
+}
+
 }

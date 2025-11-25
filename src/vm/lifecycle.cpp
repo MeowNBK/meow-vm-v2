@@ -20,19 +20,19 @@ Machine::Machine(const std::string& entry_point_directory, const std::string& en
     context_ = std::make_unique<ExecutionContext>();
     builtins_ = std::make_unique<BuiltinRegistry>();
 
-    auto gc = std::make_unique<meow::MarkSweepGC>(context_.get(), builtins_.get());
+    auto gc = std::make_unique<MarkSweepGC>(context_.get(), builtins_.get());
 
-    heap_ = std::make_unique<meow::MemoryManager>(std::move(gc));
+    heap_ = std::make_unique<MemoryManager>(std::move(gc));
 
-    mod_manager_ = std::make_unique<meow::ModuleManager>(heap_.get(), this);
+    mod_manager_ = std::make_unique<ModuleManager>(heap_.get(), this);
     op_dispatcher_ = std::make_unique<OperatorDispatcher>(heap_.get());
 
-    meow::printl("Machine initialized successfully!");
-    meow::printl("Detected size of value is: {} bytes", sizeof(meow::value_t));
+    printl("Machine initialized successfully!");
+    printl("Detected size of value is: {} bytes", sizeof(value_t));
 }
 
 Machine::~Machine() noexcept {
-    meow::printl("Machine shutting down.");
+    printl("Machine shutting down.");
 }
 
 void Machine::interpret() noexcept {

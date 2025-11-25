@@ -7,23 +7,23 @@
 #include "debug/print.h"
 
 namespace meow {
-inline bool recover_from_error(const meow::VMError& e, meow::ExecutionContext* context, meow::MemoryManager* heap) noexcept {
-    meow::printl("Exception caught: {}", e.what());
+inline bool recover_from_error(const VMError& e, ExecutionContext* context, MemoryManager* heap) noexcept {
+    printl("Exception caught: {}", e.what());
 
     if (context->exception_handlers_.empty()) {
-        meow::printl("Uncaught exception! VM Halting.");
+        printl("Uncaught exception! VM Halting.");
         return false; // Chết vinh quang, không cứu được
     }
 
     // 1. Lấy handler gần nhất
     auto& handlers = context->exception_handlers_;
-    meow::ExceptionHandler handler = handlers.back();
+    ExceptionHandler handler = handlers.back();
     handlers.pop_back();
 
     // 2. Unwind Call Stack
     while (context->call_stack_.size() - 1 > handler.frame_depth_) {
-        meow::CallFrame& frame = context->call_stack_.back();
-        meow::close_upvalues(context, frame.start_reg_);
+        CallFrame& frame = context->call_stack_.back();
+        close_upvalues(context, frame.start_reg_);
         context->call_stack_.pop_back();
     }
 
@@ -45,7 +45,7 @@ inline bool recover_from_error(const meow::VMError& e, meow::ExecutionContext* c
         if (abs_reg >= context->registers_.size()) {
             context->registers_.resize(abs_reg + 1);
         }
-        context->registers_[context->current_base_ + handler.error_reg_] = meow::value_t(heap->new_string(e.what()));
+        context->registers_[context->current_base_ + handler.error_reg_] = value_t(heap->new_string(e.what()));
     }
 
     return true; // Đã cứu thành công
