@@ -21,12 +21,7 @@ target_compile_features(masm PRIVATE cxx_std_23)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     "${PROJECT_SOURCE_DIR}/include"
-    "${PROJECT_SOURCE_DIR}/include/common"
-    "${PROJECT_SOURCE_DIR}/include/runtime"
-    "${PROJECT_SOURCE_DIR}/include/vm"
-    "${PROJECT_SOURCE_DIR}/include/memory"
-    "${PROJECT_SOURCE_DIR}/include/loader"
-    "${PROJECT_SOURCE_DIR}/include/module"
+    "${PROJECT_SOURCE_DIR}/libs"
 )
 
 # --- Precompiled Headers (PCH) ---
