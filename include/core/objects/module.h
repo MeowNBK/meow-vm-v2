@@ -18,7 +18,7 @@
 
 namespace meow {
 class ObjModule : public ObjBase<ObjectType::MODULE> {
-   private:
+private:
     using string_t = string_t;
     using proto_t = proto_t;
     using module_map = std::unordered_map<string_t, value_t>;
@@ -34,9 +34,8 @@ class ObjModule : public ObjBase<ObjectType::MODULE> {
 
     State state;
 
-   public:
-    explicit ObjModule(string_t file_name, string_t file_path, proto_t main_proto = nullptr) noexcept : file_name_(file_name), file_path_(file_path), main_proto_(main_proto) {
-    }
+public:
+    explicit ObjModule(string_t file_name, string_t file_path, proto_t main_proto = nullptr) noexcept : file_name_(file_name), file_path_(file_path), main_proto_(main_proto) {}
 
     // --- Globals ---
     inline return_t get_global(string_t name) noexcept {

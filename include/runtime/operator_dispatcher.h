@@ -15,10 +15,10 @@ using binary_function_t = return_t (*)(param_t, param_t);
 using unary_function_t = return_t (*)(param_t);
 
 inline constexpr size_t operator+(ValueType value_type) noexcept {
-    return static_cast<size_t>(value_type);
+    return static_cast<size_t>(std::to_underlying(value_type));
 }
 inline constexpr size_t operator+(OpCode op_code) noexcept {
-    return static_cast<size_t>(op_code);
+    return static_cast<size_t>(std::to_underlying(op_code));
 }
 
 inline ValueType get_value_type(param_t value) noexcept {
@@ -44,9 +44,13 @@ public:
         return unary_dispatch_table_[+op_code][+right_type];
     }
 
-    // inline binary_function_t operator[](core::OpCode op, core::ValueType lhs, core::ValueType rhs) const noexcept {
-    //     return binary_dispatch_table_[+op][+lhs][+rhs];
-    // }
+    inline binary_function_t operator[](OpCode op, ValueType lhs, ValueType rhs) const noexcept {
+        return binary_dispatch_table_[+op][+lhs][+rhs];
+    }
+
+    inline unary_function_t operator[](OpCode op, ValueType rhs) const noexcept {
+        return unary_dispatch_table_[+op][+rhs];
+    }
 private:
     [[maybe_unused]] MemoryManager* heap_;
     binary_function_t binary_dispatch_table_[NUM_OPCODES][NUM_VALUE_TYPES][NUM_VALUE_TYPES];

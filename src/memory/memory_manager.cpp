@@ -52,6 +52,11 @@ module_t MemoryManager::new_module(string_t file_name, string_t file_path, proto
     return new_object<ObjModule>(file_name, file_path, main_proto);
 }
 
+
+// module_t MemoryManager::new_module(string_t file_name, string_t file_path, proto_t main_proto, size_t globals_count) noexcept {
+//     return new_object<ObjModule>(file_name, file_path, main_proto, globals_count);
+// }
+
 class_t MemoryManager::new_class(string_t name) noexcept {
     return new_object<ObjClass>(name);
 }

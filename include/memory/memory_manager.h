@@ -20,6 +20,7 @@ public:
     proto_t new_proto(size_t registers, size_t upvalues, string_t name, Chunk&& chunk, std::vector<UpvalueDesc>&& descs) noexcept;
     function_t new_function(proto_t proto) noexcept;
     module_t new_module(string_t file_name, string_t file_path, proto_t main_proto = nullptr) noexcept;
+    // module_t new_module(string_t file_name, string_t file_path, proto_t main_proto = nullptr, size_t globals_count = 0) noexcept;
     class_t new_class(string_t name = nullptr) noexcept;
     instance_t new_instance(class_t klass) noexcept;
     bound_method_t new_bound_method(instance_t instance, function_t function) noexcept;
