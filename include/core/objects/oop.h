@@ -33,10 +33,10 @@ class ObjClass : public ObjBase<ObjectType::CLASS> {
     }
 
     // --- Metadata ---
-    [[nodiscard]] inline string_t get_name() const noexcept {
+    inline string_t get_name() const noexcept {
         return name_;
     }
-    [[nodiscard]] inline class_t get_super() const noexcept {
+    inline class_t get_super() const noexcept {
         return superclass_;
     }
     inline void set_super(class_t super) noexcept {
@@ -44,10 +44,10 @@ class ObjClass : public ObjBase<ObjectType::CLASS> {
     }
 
     // --- Methods ---
-    [[nodiscard]] inline bool has_method(string_t name) const noexcept {
+    inline bool has_method(string_t name) const noexcept {
         return methods_.find(name) != methods_.end();
     }
-    [[nodiscard]] inline return_t get_method(string_t name) noexcept {
+    inline return_t get_method(string_t name) noexcept {
         return methods_[name];
     }
     inline void set_method(string_t name, return_t value) noexcept {
@@ -72,7 +72,7 @@ class ObjInstance : public ObjBase<ObjectType::INSTANCE> {
     }
 
     // --- Metadata ---
-    [[nodiscard]] inline class_t get_class() const noexcept {
+    inline class_t get_class() const noexcept {
         return klass_;
     }
     inline void set_class(class_t klass) noexcept {
@@ -80,13 +80,13 @@ class ObjInstance : public ObjBase<ObjectType::INSTANCE> {
     }
 
     // --- Fields ---
-    [[nodiscard]] inline return_t get_field(string_t name) noexcept {
+    inline return_t get_field(string_t name) noexcept {
         return fields_[name];
     }
     inline void set_field(string_t name, param_t value) noexcept {
         fields_[name] = value;
     }
-    [[nodiscard]] inline bool has_field(string_t name) const {
+    inline bool has_field(string_t name) const {
         return fields_.find(name) != fields_.end();
     }
 

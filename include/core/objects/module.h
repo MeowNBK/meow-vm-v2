@@ -39,13 +39,13 @@ class ObjModule : public ObjBase<ObjectType::MODULE> {
     }
 
     // --- Globals ---
-    [[nodiscard]] inline return_t get_global(string_t name) noexcept {
+    inline return_t get_global(string_t name) noexcept {
         return globals_[name];
     }
     inline void set_global(string_t name, param_t value) noexcept {
         globals_[name] = value;
     }
-    [[nodiscard]] inline bool has_global(string_t name) {
+    inline bool has_global(string_t name) {
         return globals_.contains(name);
     }
     inline void import_all_global(const module_t other) noexcept {
@@ -55,13 +55,13 @@ class ObjModule : public ObjBase<ObjectType::MODULE> {
     }
 
     // --- Exports ---
-    [[nodiscard]] inline return_t get_export(string_t name) noexcept {
+    inline return_t get_export(string_t name) noexcept {
         return exports_[name];
     }
     inline void set_export(string_t name, param_t value) noexcept {
         exports_[name] = value;
     }
-    [[nodiscard]] inline bool has_export(string_t name) {
+    inline bool has_export(string_t name) {
         return exports_.contains(name);
     }
     inline void import_all_export(const module_t other) noexcept {
@@ -96,10 +96,10 @@ class ObjModule : public ObjBase<ObjectType::MODULE> {
     inline void set_executed() noexcept {
         state = State::EXECUTED;
     }
-    [[nodiscard]] inline bool is_executing() const noexcept {
+    inline bool is_executing() const noexcept {
         return state == State::EXECUTING;
     }
-    [[nodiscard]] inline bool is_executed() const noexcept {
+    inline bool is_executed() const noexcept {
         return state == State::EXECUTED;
     }
 

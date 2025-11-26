@@ -74,26 +74,26 @@ class ObjFunctionProto : public ObjBase<ObjectType::PROTO> {
     }
 
     /// @brief Unchecked upvalue desc access. For performance-critical code
-    [[nodiscard]] inline const UpvalueDesc& get_desc(size_t index) const noexcept {
+    inline const UpvalueDesc& get_desc(size_t index) const noexcept {
         return upvalue_descs_[index];
     }
     /// @brief Checked upvalue desc access. For performence-critical code
-    [[nodiscard]] inline const UpvalueDesc& at_desc(size_t index) const {
+    inline const UpvalueDesc& at_desc(size_t index) const {
         return upvalue_descs_.at(index);
     }
-    [[nodiscard]] inline size_t get_num_registers() const noexcept {
+    inline size_t get_num_registers() const noexcept {
         return num_registers_;
     }
-    [[nodiscard]] inline size_t get_num_upvalues() const noexcept {
+    inline size_t get_num_upvalues() const noexcept {
         return num_upvalues_;
     }
-    [[nodiscard]] inline string_t get_name() const noexcept {
+    inline string_t get_name() const noexcept {
         return name_;
     }
-    [[nodiscard]] inline const chunk_t& get_chunk() const noexcept {
+    inline const chunk_t& get_chunk() const noexcept {
         return chunk_;
     }
-    [[nodiscard]] inline size_t desc_size() const noexcept {
+    inline size_t desc_size() const noexcept {
         return upvalue_descs_.size();
     }
 
@@ -113,11 +113,11 @@ class ObjClosure : public ObjBase<ObjectType::FUNCTION> {
     explicit ObjClosure(proto_t proto = nullptr) noexcept : proto_(proto), upvalues_(proto ? proto->get_num_upvalues() : 0) {
     }
 
-    [[nodiscard]] inline proto_t get_proto() const noexcept {
+    inline proto_t get_proto() const noexcept {
         return proto_;
     }
     /// @brief Unchecked upvalue access. For performance-critical code
-    [[nodiscard]] inline upvalue_t get_upvalue(size_t index) const noexcept {
+    inline upvalue_t get_upvalue(size_t index) const noexcept {
         return upvalues_[index];
     }
     /// @brief Unchecked upvalue modification. For performance-critical code
@@ -125,7 +125,7 @@ class ObjClosure : public ObjBase<ObjectType::FUNCTION> {
         upvalues_[index] = upvalue;
     }
     /// @brief Checked upvalue access. Throws if index is OOB
-    [[nodiscard]] inline upvalue_t at_upvalue(size_t index) const {
+    inline upvalue_t at_upvalue(size_t index) const {
         return upvalues_.at(index);
     }
 

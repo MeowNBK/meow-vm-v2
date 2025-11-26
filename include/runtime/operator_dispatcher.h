@@ -14,10 +14,10 @@ constexpr size_t NUM_OPCODES = static_cast<size_t>(OpCode::TOTAL_OPCODES);
 using binary_function_t = return_t (*)(param_t, param_t);
 using unary_function_t = return_t (*)(param_t);
 
-[[nodiscard]] inline constexpr size_t operator+(ValueType value_type) noexcept {
+inline constexpr size_t operator+(ValueType value_type) noexcept {
     return static_cast<size_t>(value_type);
 }
-[[nodiscard]] inline constexpr size_t operator+(OpCode op_code) noexcept {
+inline constexpr size_t operator+(OpCode op_code) noexcept {
     return static_cast<size_t>(op_code);
 }
 
@@ -33,18 +33,18 @@ class OperatorDispatcher {
 public:
     explicit OperatorDispatcher(MemoryManager* heap) noexcept;
 
-    [[nodiscard]] inline binary_function_t find(OpCode op_code, param_t left, param_t right) const noexcept {
+    inline binary_function_t find(OpCode op_code, param_t left, param_t right) const noexcept {
         auto left_type = get_value_type(left);
         auto right_type = get_value_type(right);
         return binary_dispatch_table_[+op_code][+left_type][+right_type];
     }
 
-    [[nodiscard]] inline unary_function_t find(OpCode op_code, param_t right) const noexcept {
+    inline unary_function_t find(OpCode op_code, param_t right) const noexcept {
         auto right_type = get_value_type(right);
         return unary_dispatch_table_[+op_code][+right_type];
     }
 
-    // [[nodiscard]] inline binary_function_t operator[](core::OpCode op, core::ValueType lhs, core::ValueType rhs) const noexcept {
+    // inline binary_function_t operator[](core::OpCode op, core::ValueType lhs, core::ValueType rhs) const noexcept {
     //     return binary_dispatch_table_[+op][+lhs][+rhs];
     // }
 private:

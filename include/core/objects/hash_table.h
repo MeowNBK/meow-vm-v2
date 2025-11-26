@@ -47,7 +47,7 @@ class ObjHashTable : public ObjBase<ObjectType::HASH_TABLE> {
     // --- Lookup ---
 
     // Unchecked lookup. For performance-critical code
-    [[nodiscard]] inline return_t get(key_t key) noexcept {
+    inline return_t get(key_t key) noexcept {
         return fields_[key];
     }
     // Unchecked lookup/update. For performance-critical code
@@ -56,18 +56,18 @@ class ObjHashTable : public ObjBase<ObjectType::HASH_TABLE> {
         fields_[key] = std::forward<T>(value);
     }
     // Checked lookup. Throws if key is not found
-    [[nodiscard]] inline return_t at(key_t key) const {
+    inline return_t at(key_t key) const {
         return fields_.at(key);
     }
-    [[nodiscard]] inline bool has(key_t key) const {
+    inline bool has(key_t key) const {
         return fields_.contains(key);
     }
 
     // --- Capacity ---
-    [[nodiscard]] inline size_t size() const noexcept {
+    inline size_t size() const noexcept {
         return fields_.size();
     }
-    [[nodiscard]] inline bool empty() const noexcept {
+    inline bool empty() const noexcept {
         return fields_.empty();
     }
 

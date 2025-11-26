@@ -24,7 +24,7 @@ struct MeowObject {
     virtual ~MeowObject() = default;
     virtual void trace(GCVisitor& visitor) const noexcept = 0;
 
-    [[nodiscard]] inline ObjectType get_type() const noexcept { return type; }
+    inline ObjectType get_type() const noexcept { return type; }
 };
 
 template <ObjectType type_tag>

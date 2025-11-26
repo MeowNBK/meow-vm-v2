@@ -42,31 +42,31 @@ public:
         write_u64(std::bit_cast<uint64_t>(value));
     }
     // --- Code buffer ---
-    [[nodiscard]] inline const uint8_t* get_code() const noexcept {
+    inline const uint8_t* get_code() const noexcept {
         return code_.data();
     }
-    [[nodiscard]] inline size_t get_code_size() const noexcept {
+    inline size_t get_code_size() const noexcept {
         return code_.size();
     }
-    [[nodiscard]] inline bool is_code_empty() const noexcept {
+    inline bool is_code_empty() const noexcept {
         return code_.empty();
     }
 
     // --- Constant pool ---
-    [[nodiscard]] inline size_t get_pool_size() const noexcept {
+    inline size_t get_pool_size() const noexcept {
         return constant_pool_.size();
     }
-    [[nodiscard]] inline bool is_pool_empty() const noexcept {
+    inline bool is_pool_empty() const noexcept {
         return constant_pool_.empty();
     }
-    [[nodiscard]] inline size_t add_constant(param_t value) {
+    inline size_t add_constant(param_t value) {
         constant_pool_.push_back(value);
         return constant_pool_.size() - 1;
     }
-    [[nodiscard]] inline return_t get_constant(size_t index) const noexcept {
+    inline return_t get_constant(size_t index) const noexcept {
         return constant_pool_[index];
     }
-    [[nodiscard]] inline value_t& get_constant_ref(size_t index) noexcept {
+    inline value_t& get_constant_ref(size_t index) noexcept {
         return constant_pool_[index];
     }
 

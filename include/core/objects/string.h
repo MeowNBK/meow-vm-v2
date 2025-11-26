@@ -50,25 +50,25 @@ public:
 
     // --- Character access (C++23) ---
     // template <typename Self>
-    // [[nodiscard]] inline decltype(auto) get(this Self&& self, size_t index) noexcept {
+    // inline decltype(auto) get(this Self&& self, size_t index) noexcept {
     //     return std::forward<Self>(self).data_[index];
     // }
 
-    [[nodiscard]] inline char get(size_t index) const noexcept {
+    inline char get(size_t index) const noexcept {
         return data_[index];
     }
     
     template <typename Self>
-    [[nodiscard]] inline decltype(auto) at(this Self&& self, size_t index) {
+    inline decltype(auto) at(this Self&& self, size_t index) {
         return std::forward<Self>(self).data_.at(index);
     }
 
     // --- String access ---
-    [[nodiscard]] inline const char* c_str() const noexcept { return data_.c_str(); }
+    inline const char* c_str() const noexcept { return data_.c_str(); }
 
     // --- Capacity ---
-    [[nodiscard]] inline size_t size() const noexcept { return data_.size(); }
-    [[nodiscard]] inline bool empty() const noexcept { return data_.empty(); }
+    inline size_t size() const noexcept { return data_.size(); }
+    inline bool empty() const noexcept { return data_.empty(); }
 
     // --- Iterators (C++23 Deducing this) ---
     

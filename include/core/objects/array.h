@@ -43,13 +43,13 @@ public:
 
     /// @brief Unchecked element access. For performance-critical code
     template <typename Self>
-    [[nodiscard]] inline decltype(auto) get(this Self&& self, size_t index) noexcept {
+    inline decltype(auto) get(this Self&& self, size_t index) noexcept {
         return std::forward<Self>(self).elements_[index]; 
     }
 
     /// @brief Checked element access. Throws if index is OOB
     template <typename Self>
-    [[nodiscard]] inline decltype(auto) at(this Self&& self, size_t index) {
+    inline decltype(auto) at(this Self&& self, size_t index) {
         return std::forward<Self>(self).elements_.at(index);
     }
 
@@ -61,12 +61,12 @@ public:
 
     // Gộp front/back
     template <typename Self>
-    [[nodiscard]] inline decltype(auto) front(this Self&& self) noexcept {
+    inline decltype(auto) front(this Self&& self) noexcept {
         return std::forward<Self>(self).elements_.front();
     }
 
     template <typename Self>
-    [[nodiscard]] inline decltype(auto) back(this Self&& self) noexcept {
+    inline decltype(auto) back(this Self&& self) noexcept {
         return std::forward<Self>(self).elements_.back();
     }
 
@@ -77,9 +77,9 @@ public:
     }
 
     // --- Capacity ---
-    [[nodiscard]] inline size_t size() const noexcept { return elements_.size(); }
-    [[nodiscard]] inline bool empty() const noexcept { return elements_.empty(); }
-    [[nodiscard]] inline size_t capacity() const noexcept { return elements_.capacity(); }
+    inline size_t size() const noexcept { return elements_.size(); }
+    inline bool empty() const noexcept { return elements_.empty(); }
+    inline size_t capacity() const noexcept { return elements_.capacity(); }
 
     // --- Modifiers ---
     template <typename T>
