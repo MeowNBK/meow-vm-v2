@@ -51,7 +51,7 @@ enum class OpCode : uint8_t {
     TOTAL_OPCODES
 };
 
-// Cấu trúc file binary dựa trên src/module/loader/binary_loader.cpp:
+// Cấu trúc file binary dựa trên src/bytecode/binary_loader.cpp:
 // 1. Magic (u32): 0x4D454F57 ("MEOW")
 // 2. Version (u32): 1
 // 3. Main Proto Index (u32)

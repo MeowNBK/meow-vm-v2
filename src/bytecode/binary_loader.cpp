@@ -1,9 +1,9 @@
-#include "module/loader/binary_loader.h"
+#include "bytecode/binary_loader.h"
 #include "memory/memory_manager.h"
 #include "core/objects/string.h"
 #include "core/objects/function.h"
 #include "core/value.h"
-#include "runtime/chunk.h"
+#include "bytecode/chunk.h"
 
 namespace meow {
 
@@ -201,12 +201,12 @@ proto_t BinaryLoader::load_module() {
 }
 
 
-// #include "module/loader/binary_loader.h"
+// #include "bytecode/binary_loader.h"
 // #include "memory/memory_manager.h"
 // #include "core/objects/string.h"
 // #include "core/objects/function.h"
 // #include "core/value.h"
-// #include "runtime/chunk.h"
+// #include "bytecode/chunk.h"
 
 // #include <bit>      // std::bit_cast, std::endian
 // #include <cstring>  // std::memcpy

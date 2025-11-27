@@ -2,7 +2,7 @@
 
 #include "common/pch.h"
 #include "common/definitions.h"
-#include "runtime/chunk.h"
+#include "bytecode/chunk.h"
 #include "core/objects/function.h"
 
 namespace meow {
@@ -54,7 +54,7 @@ private:
 
 // #include "common/pch.h"
 // #include "common/definitions.h"
-// #include "runtime/chunk.h"
+// #include "bytecode/chunk.h"
 // #include "core/objects/function.h"
 // #include <expected> // C++23 Power!
 

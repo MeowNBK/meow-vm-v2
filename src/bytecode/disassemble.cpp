@@ -1,9 +1,9 @@
-#include "debug/disassemble.h"
+#include "bytecode/disassemble.h"
 #include "common/definitions.h"
 #include "core/objects.h"
-#include "core/op_codes.h"
+#include "bytecode/op_codes.h"
 #include "core/value.h"
-#include "runtime/chunk.h"
+#include "bytecode/chunk.h"
 
 namespace meow {
 

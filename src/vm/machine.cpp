@@ -1,6 +1,6 @@
 #include "vm/machine.h"
 #include "common/pch.h"
-#include "core/op_codes.h"
+#include "bytecode/op_codes.h"
 #include "memory/mark_sweep_gc.h"
 #include "memory/memory_manager.h"
 #include "module/module_manager.h"

@@ -6,7 +6,7 @@
 #include "memory/memory_manager.h"
 #include "module/module_utils.h"
 #include "vm/meow_engine.h"
-#include "module/loader/binary_loader.h"
+#include "bytecode/binary_loader.h"
 
 namespace meow {
 

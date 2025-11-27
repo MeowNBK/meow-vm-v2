@@ -15,7 +15,7 @@
 #include "common/definitions.h"
 #include "core/value.h"
 #include "memory/gc_visitor.h"
-#include "runtime/chunk.h"
+#include "bytecode/chunk.h"
 
 namespace meow {
 struct UpvalueDesc {

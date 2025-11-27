@@ -4,7 +4,7 @@
 #include "common/definitions.h"
 #include "core/objects.h"
 #include "core/value.h"
-#include "debug/disassemble.h"
+#include "bytecode/disassemble.h"
 
 namespace meow {
 
