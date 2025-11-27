@@ -14,8 +14,7 @@ struct GCMetadata {
 
 class MarkSweepGC : public GarbageCollector, public GCVisitor {
 public:
-    explicit MarkSweepGC(ExecutionContext* context, BuiltinRegistry* builtins) noexcept : context_(context), builtins_(builtins) {
-    }
+    explicit MarkSweepGC(ExecutionContext* context) noexcept : context_(context) {}
     ~MarkSweepGC() noexcept override;
 
     // -- Collector ---
@@ -28,9 +27,7 @@ public:
 private:
     std::unordered_map<const MeowObject*, GCMetadata> metadata_;
     ExecutionContext* context_ = nullptr;
-    BuiltinRegistry* builtins_ = nullptr;
 
     void mark(const MeowObject* object);
-
 };
 }

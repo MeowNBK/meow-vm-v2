@@ -32,7 +32,6 @@ public:
 private:
     // --- Subsystems ---
     std::unique_ptr<ExecutionContext> context_;
-    std::unique_ptr<BuiltinRegistry> builtins_;
     std::unique_ptr<MemoryManager> heap_;
     std::unique_ptr<ModuleManager> mod_manager_;
     std::unique_ptr<OperatorDispatcher> op_dispatcher_;

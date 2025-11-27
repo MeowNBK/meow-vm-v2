@@ -18,9 +18,8 @@ Machine::Machine(const std::string& entry_point_directory, const std::string& en
     }
 
     context_ = std::make_unique<ExecutionContext>();
-    builtins_ = std::make_unique<BuiltinRegistry>();
 
-    auto gc = std::make_unique<MarkSweepGC>(context_.get(), builtins_.get());
+    auto gc = std::make_unique<MarkSweepGC>(context_.get());
 
     heap_ = std::make_unique<MemoryManager>(std::move(gc));
 

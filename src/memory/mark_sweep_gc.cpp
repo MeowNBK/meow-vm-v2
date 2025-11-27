@@ -26,7 +26,6 @@ size_t MarkSweepGC::collect() noexcept {
     // std::println("[collect] Đang collect các object");
 
     context_->trace(*this);
-    builtins_->trace(*this);
 
     for (auto it = metadata_.begin(); it != metadata_.end();) {
         const MeowObject* object = it->first;
