@@ -17,8 +17,7 @@ MarkSweepGC::~MarkSweepGC() noexcept {
 }
 
 void MarkSweepGC::register_object(const MeowObject* object) {
-    std::cout << "[register] Đang đăng kí object: " << object << std::endl;
-    // std::println("[register] Đang đăng kí object: ", object);
+    std::println("[register] Đang đăng kí object: {:p}", static_cast<const void*>(object));
     metadata_.emplace(object, GCMetadata{});
 }
 
