@@ -22,7 +22,7 @@
         uint16_t src = READ_U16(); \
         auto& val = REGISTER(src); \
         if (auto func = op_dispatcher_->find(OpCode::OPCODE, val)) { \
-            REGISTER(dst) = func(val); \
+            REGISTER(dst) = func(heap_.get(), val); \
         } else { \
             throw_vm_error("Unsupported unary operator " OPNAME); \
         } \
@@ -37,7 +37,7 @@
         auto& left = REGISTER(r1); \
         auto& right = REGISTER(r2); \
         if (auto func = op_dispatcher_->find(OpCode::OPCODE, left, right)) { \
-            REGISTER(dst) = func(left, right); \
+            REGISTER(dst) = func(heap_.get(), left, right); \
         } else { \
             throw_vm_error("Unsupported binary operator " OPNAME); \
         } \
